@@ -1,2 +1,5 @@
+.env
 .local-inference/
+.venv-aiperf/
 __pycache__/
+results/
