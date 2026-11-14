@@ -6,5 +6,7 @@
 
 The [original GB10 runbook](GB10-RUNBOOK.md) provides background and a matrix;
 its Qwen/SGLang assumptions are superseded by the Nemotron/vLLM guides above.
-The guides describe planned work; only the local Ollama smoke test has been
-performed so far.
+Start with [the VAST baseline setup](../profiling/README.md). The shared Reactome
+input suite and answer checks have been prepared on the cluster, and AIPerf
+0.13.0 is installed. Input token sizing still needs the pinned tokenizer; no
+Nemotron performance or accuracy run has been completed.

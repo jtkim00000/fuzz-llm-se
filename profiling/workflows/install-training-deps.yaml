@@ -1,0 +1,35 @@
+version: v4
+volumes:
+  results:
+    name: profiling-results
+jobs:
+  install-training-deps:
+    image:
+      uri: docker://python:3.11
+    mounts:
+      /results: results
+    resource:
+      cpu:
+        cores: 2
+      memory:
+        size: 4GB
+    script: |
+      #!/bin/sh
+      set -eu
+      CLIENT_ENV='/results/benchmark-env-xzAhY13Y'
+      CHECK_DIR=$(mktemp -d /results/training-dependency-check-XXXXXXXX)
+      export CLIENT_ENV CHECK_DIR
+      python - <<'PYCODE'
+      import os, subprocess
+      from pathlib import Path
+      directory=Path(os.environ['CHECK_DIR'])
+      python=Path(os.environ['CLIENT_ENV'])/'venv/bin/python'
+      with (directory/'install.log').open('w') as log:
+          result=subprocess.run([str(python),'-m','pip','install','--no-compile','scikit-learn==1.7.2'],stdout=log,stderr=subprocess.STDOUT,timeout=900)
+      if result.returncode:
+          print((directory/'install.log').read_text()[-6000:])
+          raise SystemExit(result.returncode)
+      PYCODE
+      "$CLIENT_ENV/venv/bin/python" -m pip freeze > "$CHECK_DIR/requirements.lock.txt"
+      "$CLIENT_ENV/venv/bin/python" -c 'import sklearn; print("SKLEARN_VERSION="+sklearn.__version__)'
+      printf 'CHECK_DIR=%s\n' "$CHECK_DIR"

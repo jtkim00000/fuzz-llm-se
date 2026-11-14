@@ -1,0 +1,90 @@
+{
+  "train_after_collection": false,
+  "stop_sweep": {
+    "max_error_fraction": 0.05,
+    "max_client_delay_ms": 2000
+  },
+  "experiments": [
+    {
+      "config": "/results/REPLACE-collection-config.json",
+      "tokenizer": "/REPLACE/TOKENIZER",
+      "cells": [
+        {
+          "trace": "/results/traces/REPLACE-short-train.jsonl",
+          "concurrency": 1,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-validation.jsonl",
+          "concurrency": 1,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-test.jsonl",
+          "concurrency": 1,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-train.jsonl",
+          "concurrency": 2,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-validation.jsonl",
+          "concurrency": 2,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-test.jsonl",
+          "concurrency": 2,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-train.jsonl",
+          "concurrency": 4,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-validation.jsonl",
+          "concurrency": 4,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-test.jsonl",
+          "concurrency": 4,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-train.jsonl",
+          "concurrency": 8,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-validation.jsonl",
+          "concurrency": 8,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-test.jsonl",
+          "concurrency": 8,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-train.jsonl",
+          "concurrency": 16,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-validation.jsonl",
+          "concurrency": 16,
+          "repetitions": 3
+        },
+        {
+          "trace": "/results/traces/REPLACE-short-test.jsonl",
+          "concurrency": 16,
+          "repetitions": 3
+        }
+      ]
+    }
+  ]
+}

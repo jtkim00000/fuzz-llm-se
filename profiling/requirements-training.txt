@@ -1,0 +1,2 @@
+# Install alongside the pinned AIPerf environment; capture pip freeze after install.
+scikit-learn==1.7.2

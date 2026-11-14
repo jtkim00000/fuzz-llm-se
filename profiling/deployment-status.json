@@ -1,0 +1,34 @@
+{
+  "preparation_workflow_id": "a999ea50-a862-4d2d-9925-0844b67f10ad",
+  "prepared_root": "/results/baseline-prep-IQ1zkCdX",
+  "source_sha256": "b8103a50d625ffb6acd18cddffcce0ceb0fdf36b19392d104c32bb1fcc7e2f9f",
+  "suite_mode": "character-preview",
+  "accuracy_keys_verified": 20,
+  "client_install_workflow_id": "0b4f2413-901f-40e5-9e5a-15b1f230b91a",
+  "client_env": "/results/benchmark-env-xzAhY13Y",
+  "client_install_status": "completed",
+  "pending": [
+    "pinned tokenizer and revision",
+    "reachable worker endpoint and served model",
+    "effective worker configuration",
+    "server metrics endpoint",
+    "cold/warm procedure",
+    "authenticated AIPerf integration if endpoint requires credentials"
+  ],
+  "previous_failed_install_workflow_id": "35231fda-9be9-4cb9-b56c-4e1b0b9949ec",
+  "previous_failed_install_reason": "crick ARM build required gcc absent in slim image",
+  "aiperf_version": "0.13.0",
+  "aiperf_help_verified": true,
+  "regression_extension": {
+    "repository_ready": true,
+    "remote_tools_updated": true,
+    "training_dependency_installed_remotely": true,
+    "mock_tests_only": true,
+    "prepared_root": "/results/baseline-prep-qzFEdMaQ",
+    "tool_deployment_workflow_id": "ec10eb39-487a-4466-9e8a-cf10968ce346",
+    "training_dependency_workflow_id": "29ee6e1f-c682-4026-9283-c62200fff4c3",
+    "training_dependency_check": "/results/training-dependency-check-2IhIFiYQ",
+    "sklearn_version": "1.7.2",
+    "offline_and_mock_tests_passed": 11
+  }
+}

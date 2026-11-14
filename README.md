@@ -49,5 +49,6 @@ definitions and cluster access still need to be supplied.
   repository's submodule pointer.
 - `docker-compose.yml` — local Open WebUI service.
 - `.env.example` — optional Open WebUI connection defaults.
-- `profiling/` — AIPerf smoke test and notes on collecting router data.
+- `profiling/` — VAST-backed benchmark preparation, AIPerf workflows, and
+  deterministic retrieval/JSON accuracy evaluation. See [the setup guide](profiling/README.md).
 - `docs/` — step-by-step profiling guides and the GB10 runbook.
