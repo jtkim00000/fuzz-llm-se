@@ -1,0 +1,2 @@
+# Shared FastAPI/httpx/uvicorn pins; no model-serving dependencies.
+-r requirements-local-workers.txt
