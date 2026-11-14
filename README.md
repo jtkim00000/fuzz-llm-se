@@ -53,6 +53,12 @@ hardware settings before profiling. Verify BF16 and FP8 support on the actual
 GB10 workers and expose their endpoints to the gateway; Fuzzball workflow
 definitions and cluster access still need to be supplied.
 
+For the BF16-versus-FP8 KV-cache comparison, use the
+[stock-engine launch profiles](docs/precision-profiles.md). The FP8 worker uses
+`configs/kv-cache/fp8.yaml`; the matched BF16 worker uses
+`configs/kv-cache/bf16.yaml`. Both profiles keep the model compute dtype at
+BF16 and use the same checkpoint and engine build.
+
 ## Repository layout
 
 - `vllm/` — vendored vLLM source at the revision previously referenced by the

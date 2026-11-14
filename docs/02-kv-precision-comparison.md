@@ -9,6 +9,11 @@ single-worker configurations, not a dual-worker routing test. Use the same
 ThinkStation when practical; otherwise measure node differences and document
 them. Coordinate Fuzzball worker restarts and ensure no competing workload.
 
+Use the checked-in [BF16 and FP8 launch profiles](precision-profiles.md) with
+the same stock engine build. Select `configs/kv-cache/fp8.yaml` for the FP8
+worker and `configs/kv-cache/bf16.yaml` for the matched baseline. Separate
+source branches and bulk kernel dtype substitutions are not required.
+
 The repo's vLLM source includes `bfloat16` and `fp8` as KV dtype options;
 confirm the deployed build supports them using `vllm serve --help`. The
 typical overrides are `--kv-cache-dtype bfloat16` and `--kv-cache-dtype fp8`.

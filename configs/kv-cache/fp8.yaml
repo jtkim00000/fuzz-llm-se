@@ -1,0 +1,3 @@
+# Stock vLLM: FP8 KV storage with BF16 model compute dtype.
+dtype: bfloat16
+kv-cache-dtype: fp8
