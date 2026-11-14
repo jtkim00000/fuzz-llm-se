@@ -1,0 +1,67 @@
+{
+  "policy": "single",
+  "concurrency": 4,
+  "sample_interval_seconds": 1,
+  "metrics_timeout_seconds": 3,
+  "request_timeout_seconds": 900,
+  "cache_condition": "unverified",
+  "workers": [
+    {
+      "id": "fp8",
+      "url": "http://192.168.99.13:18027",
+      "metrics_url": "http://192.168.99.13:18027/metrics",
+      "health_url": "http://192.168.99.13:18027/health",
+      "model": "nvidia/Qwen3.8-27B-NVFP4",
+      "manifest_path": "/results/profiling-bf16-fp8-vast-2026-11-14/fp8/manifests/worker.json",
+      "metric_map": {
+        "running_requests": {
+          "metric": "vllm:num_requests_running"
+        },
+        "queued_requests": {
+          "metric": "vllm:num_requests_waiting"
+        },
+        "kv_cache_usage": {
+          "metric": "vllm:kv_cache_usage_perc"
+        }
+      },
+      "manifest": {
+        "effective_configuration_verified": true,
+        "fuzzball_workflow_id": "95e2dc41-c219-4cde-8fb3-64858ca262e4",
+        "worker_id": "SPARK04-fp8-worker",
+        "engine_version": "vLLM 0.28.0",
+        "image": "vllm/vllm-openai:v0.28.0",
+        "model_checkpoint": "nvidia/Qwen3.8-27B-NVFP4",
+        "model_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+        "tokenizer_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+        "served_model_id": "nvidia/Qwen3.8-27B-NVFP4",
+        "effective_kv_dtype": "fp8_e4m3fn",
+        "kv_scales": "not reported in launch logs",
+        "attention_backend": "FlashInfer; decode backend xqa",
+        "max_model_len": 8192,
+        "batching_settings": {
+          "max_num_seqs": 4,
+          "max_num_batched_tokens": 2048,
+          "gpu_memory_utilization": 0.6,
+          "kv_cache_memory_bytes": 8589934592,
+          "enforce_eager": true
+        },
+        "prefix_caching": true,
+        "thinking_mode": false,
+        "gpu": "NVIDIA GB10",
+        "gpu_count": 1,
+        "warmup_and_cache_procedure": "One preflight request per worker, then measured closed-loop concurrency=4; server cache state is not resettable from the benchmark client.",
+        "launch_arguments": "--kv-cache-dtype fp8; resolved torch.float8_e4m3fn verified from vLLM startup log",
+        "client_to_worker_route": "http://192.168.99.13:18027",
+        "hardware_metrics_endpoint": "http://192.168.99.13:18027/metrics",
+        "missing_measurements": [
+          "KV scale values",
+          "GPU counter exporter"
+        ],
+        "notes": [
+          "Weights use modelopt_mixed NVFP4; this is distinct from attention KV dtype."
+        ]
+      },
+      "configuration_hash": "c28737c13daa5e7fbc5a0559248e88ad319fbef6edc7858afb530f334001c7f6"
+    }
+  ]
+}

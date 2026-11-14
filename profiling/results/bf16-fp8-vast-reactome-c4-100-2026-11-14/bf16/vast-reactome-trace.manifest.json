@@ -1,0 +1,15 @@
+{
+  "dataset": "VAST ReactomePathways.txt",
+  "source_path": "/datasets/bio/reactome/ReactomePathways.txt",
+  "source_sha256": "b8103a50d625ffb6acd18cddffcce0ceb0fdf36b19392d104c32bb1fcc7e2f9f",
+  "trace_sha256": "f387617658581cb51597901134bdf082e0c075f9f1e1ef0cb374d964bffd43fb",
+  "count": 100,
+  "seed": 20261114,
+  "tokenizer": "/models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80",
+  "chat_template": "tokenizer.apply_chat_template(messages, add_generation_prompt=True, enable_thinking=False)",
+  "input_tokens_min": 5889,
+  "input_tokens_max": 6200,
+  "input_tokens_mean": 6081.18,
+  "requested_output_token_limit": 128,
+  "workload_note": "Long, distinct VAST Reactome retrieval contexts exercise attention KV capacity and bandwidth; this trace does not claim multi-turn prefix-cache reuse."
+}

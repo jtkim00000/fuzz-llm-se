@@ -1,0 +1,67 @@
+{
+  "policy": "single",
+  "concurrency": 4,
+  "sample_interval_seconds": 1,
+  "metrics_timeout_seconds": 3,
+  "request_timeout_seconds": 900,
+  "cache_condition": "unverified",
+  "workers": [
+    {
+      "id": "bf16",
+      "url": "http://192.168.99.12:18027",
+      "metrics_url": "http://192.168.99.12:18027/metrics",
+      "health_url": "http://192.168.99.12:18027/health",
+      "model": "nvidia/Qwen3.8-27B-NVFP4",
+      "manifest_path": "/results/profiling-bf16-fp8-vast-2026-11-14/bf16/manifests/worker.json",
+      "metric_map": {
+        "running_requests": {
+          "metric": "vllm:num_requests_running"
+        },
+        "queued_requests": {
+          "metric": "vllm:num_requests_waiting"
+        },
+        "kv_cache_usage": {
+          "metric": "vllm:kv_cache_usage_perc"
+        }
+      },
+      "manifest": {
+        "effective_configuration_verified": true,
+        "fuzzball_workflow_id": "c8b096fd-97a8-44f2-91bd-7d60db53c916",
+        "worker_id": "SPARK03-bf16-worker-a",
+        "engine_version": "vLLM 0.28.0",
+        "image": "vllm/vllm-openai:v0.28.0",
+        "model_checkpoint": "nvidia/Qwen3.8-27B-NVFP4",
+        "model_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+        "tokenizer_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+        "served_model_id": "nvidia/Qwen3.8-27B-NVFP4",
+        "effective_kv_dtype": "bfloat16",
+        "kv_scales": "not reported in launch logs",
+        "attention_backend": "FlashAttention",
+        "max_model_len": 8192,
+        "batching_settings": {
+          "max_num_seqs": 4,
+          "max_num_batched_tokens": 2048,
+          "gpu_memory_utilization": 0.6,
+          "kv_cache_memory_bytes": 8589934592,
+          "enforce_eager": true
+        },
+        "prefix_caching": true,
+        "thinking_mode": false,
+        "gpu": "NVIDIA GB10",
+        "gpu_count": 1,
+        "warmup_and_cache_procedure": "One preflight request per worker, then measured closed-loop concurrency=4; server cache state is not resettable from the benchmark client.",
+        "launch_arguments": "--kv-cache-dtype bfloat16; effective value verified from vLLM startup log",
+        "client_to_worker_route": "http://192.168.99.12:18027",
+        "hardware_metrics_endpoint": "http://192.168.99.12:18027/metrics",
+        "missing_measurements": [
+          "KV scale values",
+          "GPU counter exporter"
+        ],
+        "notes": [
+          "Weights use modelopt_mixed NVFP4; this is distinct from attention KV dtype."
+        ]
+      },
+      "configuration_hash": "c19c5639dd9c9ad9d1bb661ebbb04e1b8b6c111bad474c1eb652002817feec46"
+    }
+  ]
+}

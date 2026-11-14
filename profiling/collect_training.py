@@ -191,7 +191,12 @@ def run(config,trace,out,tokenizer=None):
             if 'enable_thinking' in raw.get('chat_template_kwargs',{}):turn['thinking_enabled']=raw['chat_template_kwargs']['enable_thinking']
             messages=raw.get('messages') or history+[{'role':'user','content':raw['text']}]
             if tok:
-                try:turn['input_tokens_estimate']=len(tok.apply_chat_template(messages,tokenize=True,add_generation_prompt=True,**raw.get('chat_template_kwargs',{})))
+                try:
+                    rendered=tok.apply_chat_template(messages,tokenize=True,add_generation_prompt=True,**raw.get('chat_template_kwargs',{}))
+                    # Newer Transformers returns BatchEncoding here; len() would
+                    # count mapping keys rather than prompt tokens.
+                    token_ids=rendered['input_ids'] if hasattr(rendered,'keys') else rendered
+                    turn['input_tokens_estimate']=len(token_ids)
                 except Exception as e:raise ValueError('Tokenizer/chat template failed; fix before collection') from e
             else:turn['input_tokens_estimate']=None
             turn['estimated_total_tokens']=None if turn['input_tokens_estimate'] is None else turn['input_tokens_estimate']+turn.get('expected_output_tokens',turn['output_limit'])
@@ -200,6 +205,20 @@ def run(config,trace,out,tokenizer=None):
             if chosen:
                 worker=next(w for w in workers if w['id']==chosen['worker_id'])
                 dispatch_ns=time.time_ns()
+                selected_snapshot=chosen['snapshot']
+                state_sample_ns=selected_snapshot.get('sample_completed_ns')
+                dispatch_state={
+                    'running_requests_at_dispatch': selected_snapshot.get('state',{}).get('running_requests'),
+                    'waiting_requests_at_dispatch': selected_snapshot.get('state',{}).get('queued_requests'),
+                    'state_sample_completed_ns': state_sample_ns,
+                    'state_sample_age_ms': None if state_sample_ns is None else (dispatch_ns-state_sample_ns)/1e6,
+                }
+                # Persist this before opening the request: it is the durable record of
+                # an attempted dispatch even if the client or server fails mid-stream.
+                with lock:
+                    dispatches.write(json.dumps({'request_id':turn['request_id'],'session_id':session['session_id'],
+                        'selected_worker':worker['id'],'dispatch_ns':dispatch_ns,'input_tokens_estimate':turn['input_tokens_estimate'],
+                        'requested_output_token_limit':turn['output_limit'],**dispatch_state})+'\n');dispatches.flush()
                 try:labels,response=completion(worker,messages,turn,config.get('request_timeout_seconds',300))
                 finally:
                     with router.lock:router.outstanding[worker['id']]-=1
@@ -207,12 +226,18 @@ def run(config,trace,out,tokenizer=None):
             else:
                 dispatch_ns=time.time_ns();labels={'success':False,'http_status':None,'error_type':reason,'slo_met':False if turn.get('slo_ttft_ms') or turn.get('slo_e2e_ms') else None,'accuracy_pass':None}
                 response=None
+                dispatch_state={'running_requests_at_dispatch':None,'waiting_requests_at_dispatch':None,
+                                'state_sample_completed_ns':None,'state_sample_age_ms':None}
+                with lock:
+                    dispatches.write(json.dumps({'request_id':turn['request_id'],'session_id':session['session_id'],
+                        'selected_worker':None,'dispatch_ns':dispatch_ns,'input_tokens_estimate':turn['input_tokens_estimate'],
+                        'requested_output_token_limit':turn['output_limit'],**dispatch_state})+'\n');dispatches.flush()
             record={'request_id':turn['request_id'],'session_id':session['session_id'],'group_id':session['group_id'],'split':session['split'],
                     'turn_index':index,'task_category':raw.get('category'),'target_position':raw.get('target_position'),'arrival_ns':arrival_ns,'decision_ns':decision_ns,'dispatch_ns':dispatch_ns,'completed_ns':time.time_ns(),
                     'client_schedule_delay_ms':max(0,(dispatch_ns-arrival_ns)/1e6),'configured_thinking_mode':raw.get('chat_template_kwargs'), 'tool_call_mode':turn['tool_call_mode'],'routing_reason':reason,'candidates':candidates,
                     'selected_worker':chosen['worker_id'] if chosen else None,'session_migrated':False,'labels':labels,
                     'candidate_worker_manifests':{w['id']:w['manifest'] for w in workers},
-                    'configuration_hashes':{w['id']:w['configuration_hash'] for w in workers}}
+                    'configuration_hashes':{w['id']:w['configuration_hash'] for w in workers},**dispatch_state}
             if labels.get('e2e_ms') is not None:record['arrival_to_completion_ms']=(record['completed_ns']-arrival_ns)/1e6
             with lock:
                 responses.write(json.dumps({'request_id':turn['request_id'],'response':response})+'\n');responses.flush()
@@ -221,7 +246,7 @@ def run(config,trace,out,tokenizer=None):
     try:
         collector.start()
         started=time.perf_counter();epoch=time.time_ns()
-        with (out/'requests.jsonl').open('w') as log,(out/'responses.jsonl').open('w') as responses:
+        with (out/'requests.jsonl').open('w') as log,(out/'responses.jsonl').open('w') as responses,(out/'dispatch-ledger.jsonl').open('w') as dispatches:
             with ThreadPoolExecutor(max_workers=config.get('concurrency',1)) as pool:
                 futures=[]
                 for session in sorted(sessions,key=lambda s:s.get('arrival_offset_seconds',0)):
