@@ -7,8 +7,9 @@ submodule checkout.
 
 ## PrecisionSplit local prototype
 
-The [runnable PrecisionSplit demo](precision_split/README.md) runs two FIFO mock
-workers and a gateway with greedy predicted-finish routing and session affinity.
+The [routing guide and runnable PrecisionSplit demo](precision_split/README.md)
+explain how the gateway routes to two FIFO mock workers using greedy
+predicted-finish scores, atomic load reservations, and session affinity.
 It needs no model weights, GPU, vLLM, or Fuzzball. Both timing rules and HTTP
 worker addresses are configurable.
 
