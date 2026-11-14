@@ -1,0 +1,31 @@
+version: v4
+volumes:
+  results:
+    name: profiling-results
+jobs:
+  collect-and-train:
+    image:
+      uri: docker://python:3.11
+    mounts:
+      /results: results
+      # Add the tokenizer volume here, matching the configured container path.
+    resource:
+      cpu:
+        cores: 4
+      memory:
+        size: 8GB
+    script: |
+      #!/bin/sh
+      set -eu
+      # Redeploy current tools with make_prepare_workflow.py and use its new root.
+      TOOLS='/results/baseline-prep-qzFEdMaQ/tools'
+      CLIENT_ENV='/results/benchmark-env-xzAhY13Y'
+      CAMPAIGN='/results/REPLACE-filled-campaign.json'
+      case "$TOOLS $CLIENT_ENV $CAMPAIGN" in
+        *REPLACE*) printf 'Fill deployment paths first.\n'; exit 1 ;;
+      esac
+      "$CLIENT_ENV/venv/bin/python" -c 'import sklearn; print(sklearn.__version__)'
+      RUN_DIR=$(mktemp -d /results/training-campaign-XXXXXXXX)
+      "$CLIENT_ENV/venv/bin/python" "$TOOLS/run_campaign.py" \
+        --spec "$CAMPAIGN" --out "$RUN_DIR/campaign"
+      printf 'Campaign results: %s\n' "$RUN_DIR/campaign"

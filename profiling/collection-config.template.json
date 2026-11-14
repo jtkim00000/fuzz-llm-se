@@ -1,0 +1,62 @@
+{
+  "workers": [
+    {
+      "id": "worker-a",
+      "url": "http://REPLACE_WORKER:8000",
+      "model": "REPLACE_SERVED_MODEL",
+      "manifest_path": "/results/REPLACE-worker-manifest.json",
+      "metrics_url": "http://REPLACE_WORKER:8000/metrics",
+      "health_url": "http://REPLACE_WORKER:8000/health",
+      "api_key_env": "BENCHMARK_API_KEY",
+      "output_limit_field": "max_tokens",
+      "enabled": true,
+      "quality_approved": false,
+      "metric_map": {
+        "active_requests": null,
+        "queued_requests": {
+          "metric": "vllm:num_requests_waiting"
+        },
+        "running_sequences": null,
+        "running_requests": {
+          "metric": "vllm:num_requests_running"
+        },
+        "running_tokens": null,
+        "kv_cache_usage": {
+          "metric": "vllm:kv_cache_usage_perc",
+          "aggregation": "mean"
+        },
+        "kv_cache_free_blocks": null,
+        "prefix_cache_hit_rate": null,
+        "recent_request_rate": null,
+        "recent_token_rate": {
+          "metric": "vllm:generation_tokens_total",
+          "kind": "counter_rate"
+        },
+        "uptime_seconds": null,
+        "recent_failures": null,
+        "time_since_last_request_seconds": null,
+        "gpu_utilization": null,
+        "memory_bandwidth_utilization": null,
+        "gpu_memory_bytes": null,
+        "system_memory_bytes": null,
+        "cpu_utilization": null,
+        "network_rtt_ms": null
+      },
+      "response_label_paths": {},
+      "metric_sources": []
+    }
+  ],
+  "policy": "single",
+  "allow_preview": false,
+  "concurrency": 1,
+  "sample_interval_seconds": 1,
+  "request_timeout_seconds": 300,
+  "metrics_timeout_seconds": 2,
+  "cache_condition": "unverified",
+  "limits": {
+    "max_state_age_ms": 3000,
+    "max_kv_cache_usage": null,
+    "max_queued_requests": null,
+    "require_quality_approval": false
+  }
+}

@@ -1,3 +1,8 @@
 .env
 .venv-aiperf/
 results/
+
+# Generated workflow bundles and Python caches
+profiling/generated/
+profiling/__pycache__/
+profiling/tests/__pycache__/

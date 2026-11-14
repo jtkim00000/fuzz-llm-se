@@ -1,0 +1,46 @@
+version: v4
+volumes:
+  results:
+    name: profiling-results
+jobs:
+  baseline-pilot:
+    image:
+      uri: docker://python:3.11
+    mounts:
+      /results: results
+      # Add the agreed tokenizer-volume mount before token-based profiling.
+    resource:
+      cpu:
+        cores: 2
+      memory:
+        size: 4GB
+    script: |
+      #!/bin/sh
+      set -eu
+      # Replace these values. This template intentionally refuses to run as-is.
+      CLIENT_ENV='/results/benchmark-env-xzAhY13Y'
+      TOKENIZER='/REPLACE/PINNED_TOKENIZER'
+      WORKER_URL='http://REPLACE_WORKER_HOST:8000'
+      SERVED_MODEL='REPLACE_SERVED_MODEL_ID'
+      METRICS_URL='http://REPLACE_METRICS_HOST:8000/metrics'
+      SUITE='/results/inputs/reactome-8k-v1'
+      TOOLS='/results/baseline-prep-qzFEdMaQ/tools'
+      WORKER_MANIFEST='/REPLACE/FILLED_WORKER_MANIFEST.json'
+      case "$CLIENT_ENV $TOKENIZER $WORKER_URL $SERVED_MODEL $WORKER_MANIFEST $METRICS_URL" in
+        *REPLACE*) printf 'Fill deployment values before running.\n'; exit 1 ;;
+      esac
+      RUN_DIR=$(mktemp -d /results/stock-pilot-XXXXXXXX)
+      "$CLIENT_ENV/venv/bin/python" "$TOOLS/run_baseline.py" preflight \
+        --suite "$SUITE" --out "$RUN_DIR/preflight" \
+        --url "$WORKER_URL" --model "$SERVED_MODEL" --configuration stock \
+        --worker-manifest "$WORKER_MANIFEST"
+      "$CLIENT_ENV/venv/bin/python" "$TOOLS/run_baseline.py" performance \
+        --suite "$SUITE" --out "$RUN_DIR/performance-short-c1" \
+        --url "$WORKER_URL" --model "$SERVED_MODEL" --configuration stock \
+        --worker-manifest "$WORKER_MANIFEST" --tokenizer "$TOKENIZER" \
+        --aiperf "$CLIENT_ENV/venv/bin/aiperf" --metrics-url "$METRICS_URL" --limit 5
+      "$CLIENT_ENV/venv/bin/python" "$TOOLS/run_baseline.py" accuracy \
+        --suite "$SUITE" --out "$RUN_DIR/accuracy" \
+        --url "$WORKER_URL" --model "$SERVED_MODEL" --configuration stock \
+        --worker-manifest "$WORKER_MANIFEST" --limit 3
+      printf 'Pilot results: %s\n' "$RUN_DIR"
