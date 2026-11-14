@@ -1,0 +1,12 @@
+{
+  "bf16": {
+    "base_seconds": 0.05,
+    "input_seconds_per_token": 0.001,
+    "output_seconds_per_token": 0.004
+  },
+  "fp8": {
+    "base_seconds": 0.10,
+    "input_seconds_per_token": 0.0005,
+    "output_seconds_per_token": 0.006
+  }
+}

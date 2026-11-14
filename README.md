@@ -5,6 +5,13 @@ multiple vLLM workers. The vLLM source is vendored at [`vllm/`](vllm/), so the
 project can be extended and tested against a pinned engine revision without a
 submodule checkout.
 
+## PrecisionSplit local prototype
+
+The [runnable PrecisionSplit demo](precision_split/README.md) runs two FIFO mock
+workers and a gateway with greedy predicted-finish routing and session affinity.
+It needs no model weights, GPU, vLLM, or Fuzzball. Both timing rules and HTTP
+worker addresses are configurable.
+
 ## Open WebUI
 
 Open WebUI is included as a Docker Compose service. Start it with:
