@@ -1,0 +1,1 @@
+{"effective_configuration_verified":false,"worker_id":"SPARK04-vllm","engine_version":"0.28.0","model_checkpoint":"Qwen/Qwen2.5-Coder-7B-Instruct-AWQ","served_model_id":"Qwen/Qwen2.5-Coder-7B-Instruct-AWQ","effective_kv_dtype":"auto","attention_backend":"FLASH_ATTN","max_model_len":32768,"prefix_caching":true,"gpu_count":1}

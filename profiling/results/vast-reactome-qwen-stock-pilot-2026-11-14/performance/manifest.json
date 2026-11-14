@@ -1,0 +1,20 @@
+{
+  "mode": "performance",
+  "configuration_label": "stock",
+  "effective_configuration_verified": false,
+  "url": "http://192.168.99.13:18000",
+  "model": "Qwen/Qwen2.5-Coder-7B-Instruct-AWQ",
+  "started_utc": "2026-11-14T21:57:12.939607+00:00",
+  "suite_manifest_sha256": "d84bef36bf77aa44e4de1a12a34e778e170bd270da9de6ef9609222133d32c56",
+  "cache_condition": "unverified",
+  "status": "completed",
+  "client_script_sha256": "7b7774a8570c6ca6935bf99b165135d67b726ad31947125f5f47d580b43e17a9",
+  "grader_sha256": "7c078e0ddeb8fb35dfc68f1b2b08d6ad5066e51f8a814ce45d72ca0b88b26a7c",
+  "requested_output_limit_field": "max_tokens",
+  "sampling": {
+    "temperature": 0
+  },
+  "client_python": "3.11.18 (main, Nov  5 2026, 09:51:34) [GCC 14.2.0]",
+  "trace_sha256": "4fd044934cdf0f779bc3d482dcc7d766302804301725caceb3c0e36129aba035",
+  "ended_utc": "2026-11-14T21:58:05.866537+00:00"
+}

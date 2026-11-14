@@ -1,0 +1,31 @@
+{
+  "suite_version": "reactome-baseline-v1",
+  "source_path": "/datasets/bio/reactome/ReactomePathways.txt",
+  "source_sha256": "b8103a50d625ffb6acd18cddffcce0ceb0fdf36b19392d104c32bb1fcc7e2f9f",
+  "seed": 42,
+  "namespace": "reactome-v1",
+  "generator_sha256": "4d435014a967be63988b753ad4b84707e797b8ceff52bab6111fee088a7c4e0e",
+  "tokenizer_path": null,
+  "token_count_mode": "character-preview",
+  "input_target": 8192,
+  "chat_template_overhead_included": false,
+  "performance_requests": 100,
+  "accuracy_tasks": 20,
+  "files": {
+    "SOURCE.txt": "06fa95bac44907b33fca5a92c1540b6777b9ec5ff010199307c28ddd8536edb6",
+    "accuracy-answers.jsonl": "6c002f80cf4f93edbae98fd58d042d19c88b62518dbd2bb19463d50cfc9a7ef4",
+    "accuracy-prompts.jsonl": "46672d75ba46d7d27a3eab9a7654d9f3e4b0029ddb97f92fad4ff466552d963e",
+    "labels.jsonl": "5ed6e7a255704d1ca35c90a322c1e87e9e5dd85ce593f60006e3eccc94230b4a",
+    "original-SOURCE.txt": "e2ad7cbd2493a06e26020d86f6612eb390f8f61f6a2578d96c006b7c840dc840",
+    "performance-long.jsonl": "5593d63f5288727c732ec6637e0b4ce0db32887b6ea006b208717cf2383cdefa",
+    "performance-short.jsonl": "11d197dd4b02fb517a43fd58f84e41812073d8db8dd819925f1fd162d040b04e"
+  },
+  "limitations": [
+    "No coding or multi-turn accuracy evaluation.",
+    "Record positions are relative to record count, not exact tokens.",
+    "Token lengths exclude server-added template and prompts.",
+    "Output caps do not guarantee generated length.",
+    "Cold-cache status must be measured.",
+    "20 accuracy tasks are a pilot, not a strong noninferiority test."
+  ]
+}
