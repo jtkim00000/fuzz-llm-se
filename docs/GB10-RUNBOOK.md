@@ -1,5 +1,10 @@
 # Profiling the 27B model on the GB10 workstations
 
+> Historical background: the current team plan is NVIDIA Nemotron 3 Nano on
+> vLLM. Follow [the updated three-step guides](README.md) for the experiment;
+> this document retains earlier Qwen/SGLang assumptions and is not the current
+> model-selection or run-order instruction.
+
 This is a venue runbook, not a record of completed GB10 tests. Its goal is to
 collect measurements for a session-routing cost model and then evaluate that
 router. The Mac/Ollama smoke test is useful for learning AIPerf, but its

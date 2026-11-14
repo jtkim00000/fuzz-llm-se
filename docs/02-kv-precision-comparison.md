@@ -1,56 +1,70 @@
-# 2. Compare BF16 and FP8 KV-cache workers
+# 2. Profile one BF16 worker and one FP8 worker separately
 
-## Goal and setup
+## Purpose and prerequisites
 
-Measure the same 27B model with BF16 KV cache and FP8 KV cache on the GB10
-machines. Run a persistent worker per machine via Fuzzball; benchmark each
-directly, without the gateway, using the same engine build, checkpoint,
-tokenizer, workload, sampling, cache policy and hardware allocation. Model
-weight precision and KV-cache precision are different settings.
+Use the exact Nemotron NVFP4 checkpoint and stock vLLM setup from
+[step 1](01-single-engine-baseline.md). Run **one serving engine at a time**:
+complete the BF16 series, then the FP8 series (or vice versa). These are two
+single-worker configurations, not a dual-worker routing test. Use the same
+ThinkStation when practical; otherwise measure node differences and document
+them. Coordinate Fuzzball worker restarts and ensure no competing workload.
 
-Before measuring, prove both workers load and generate, inspect logs to verify
-effective dtype, scales and attention backend, and verify which layers or
-model state the dtype affects. The proposed RadixArk checkpoint documents
-SGLang; vLLM compatibility on the venue setup is not established. Do not
-assume `auto` means BF16 unless the effective model dtype is BF16. See sections
-1–2 of the [GB10 runbook](GB10-RUNBOOK.md).
+The repo's vLLM source includes `bfloat16` and `fp8` as KV dtype options;
+confirm the deployed build supports them using `vllm serve --help`. The
+typical overrides are `--kv-cache-dtype bfloat16` and `--kv-cache-dtype fp8`.
+Add one override to the venue-approved launch from step 1, keep every other
+setting fixed, then verify effective dtype, attention backend, FP8 scaling and
+any skipped layers from logs or instrumentation. Hybrid Nemotron also has
+Mamba state: record its dtype separately. Failure to verify means the cell is
+unverified, not a valid BF16/FP8 comparison. Consult [vLLM KV-cache documentation](https://docs.vllm.ai/en/stable/features/quantization/quantized_kvcache/).
 
-## Run matched cells
+## Run the experiment
 
-1. Use the AIPerf command in section 3 of the runbook against each worker,
-   starting with a short 8k-input, 256-output-target, concurrency-1 pilot.
-   Use the exact served model name and matching tokenizer. Verify actual input,
-   output and cached-token counts and that all requests succeeded.
-2. Expand toward the runbook matrix: 8k, 32k, 65k and 130k context; 256,
-   1,024 and 4,096 output targets; concurrency 1, 2 and 4; at least three
-   repetitions for important cells. Confirm context plus output fits and log
-   infeasible cells or OOMs. Prioritize a small subset first.
-3. For cold runs use unique prefixes and a verified cache-reset procedure;
-   warm up without contaminating the measured prefixes. Confirm cache counts.
-   For warm runs, prefill a real prefix, replay follow-ups with session
-   affinity and verify cache reuse. A single synthetic request cannot establish
-   warm-session behavior.
-4. Repeat the same fixed trace or seeded workload on both workers. Save trace
-   hashes, config, raw records, server metrics, failures, actual lengths and
-   variability. Record token-count conventions and server-side prefill/decode
-   timings where available. TTFT is a proxy, not pure prefill.
-5. Evaluate correctness independently using matched coding, repository QA and
-   JSON tasks. Predeclare an acceptable threshold and record pass/fail by
-   precision. Differences in output do not automatically mean errors.
+1. Start the BF16 worker; verify model output, effective configuration and
+   available memory. Use the same AIPerf pilot command from step 1, changing
+   `WORKER_URL` and using a distinct result directory labeled `bf16`.
+2. Run the same fixed traces, cold/warm procedures, context/output lengths,
+   request rates and concurrency levels as step 1. Repeat key cells at least
+   three times. Save raw per-request results and actual token counts.
+3. Stop/restart the worker using the approved Fuzzball procedure, then start
+   the FP8 worker and verify its effective settings. Run the exact matched
+   sequence with directories labeled `fp8`. Preserve seeds and trace hashes;
+   record output-length differences and cache hits rather than assuming them.
+4. Monitor worker health, queue/active work, GPU memory, utilization, clocks
+   and temperature where available. Record prefill and decode timings from
+   server instrumentation; TTFT is not pure prefill. Use independent GPU tools
+   for bandwidth/kernel diagnosis if supported. Report missing values.
+5. Run identical correctness tasks: executable code tests, known-answer
+   repository questions and field-level JSON extraction. Report pass rates,
+   sample sizes and flips; predeclare a tolerance before final comparisons.
+
+Changing only KV dtype isolates the precision effect. If testing custom
+kernels, run a **separate** stock-versus-custom comparison for each dtype,
+with correctness tests and kernel/build versions recorded.
+
+## Data for regression
+
+For each measured request or session retain precision, trace/session/turn IDs,
+context, newly processed and cached token counts when available, requested
+output budget, actual generated tokens, concurrency, offered load, worker
+queue/active state at assignment, TTFT, server prefill/decode timing when
+available, end-to-end time, status and configuration manifest. Raw results,
+manifests and trace hashes go in separate directories. Derived performance
+tables should include units, sample count and variation; no such generator is
+implemented yet. Low-load runs alone cannot teach load/queue behavior, so
+collect loaded traces too.
 
 ## Graph and compare
 
-- TTFT and end-to-end latency versus context length, BF16 and FP8 as separate
-  series; include variation across repetitions.
-- Decode tokens/s versus context length, separated by actual output length
-  and concurrency. Show aggregate and per-request throughput separately.
-- Cold and warm results side by side; include cache-hit counts and failures.
-- Task pass rate by precision and category, with sample size.
-- Compare the BF16 worker with the **GB10 vLLM baseline from step 1**, only if
-  model, runtime, workload and settings match. Compare BF16 with FP8 within
-  this step; do not compare either to the Mac as a precision effect.
+- TTFT and full latency versus input/context size, separated by dtype, cold or
+  warm state and concurrency; show replicate variation and failure counts.
+- Per-request decode tokens/s versus context and actual output length; report
+  aggregate throughput separately.
+- KV-cache usage and hits, GPU memory and utilization where measured; show
+  correctness pass rate per task and precision with sample sizes.
+- Compare both series to step 1's **matched stock** baseline. If stock resolves
+  to the same effective dtype and settings, describe it as the same effective
+  configuration, not an independent quantization. Do not compare Mac numbers
+  as if they came from the GB10.
 
-Use the raw measurements to create a performance table with context/new
-tokens, output tokens, concurrency, precision, timing, sample count and
-variability. This table and its generator are not yet implemented. Avoid
-filling missing cache or server-time fields with estimates presented as facts.
+Next: [train and benchmark the dual-worker gateway](03-gateway-system.md).

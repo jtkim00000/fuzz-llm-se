@@ -1,8 +1,8 @@
 # Profiling
 
-For the venue's two GB10 workers and the 27B experiment, see
-[`GB10-RUNBOOK.md`](../docs/GB10-RUNBOOK.md). The three sequential guides
-are in [`docs/`](../docs/README.md).
+For the Nemotron experiment on the venue's GB10 workstations, follow the
+three sequential guides in [`docs/`](../docs/README.md). The older GB10
+runbook is preserved as background, not as the current model plan.
 
 ## Local smoke test
 

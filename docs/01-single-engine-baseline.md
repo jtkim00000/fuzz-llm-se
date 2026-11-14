@@ -1,53 +1,98 @@
-# 1. Establish a single-engine baseline
+# 1. Profile stock vLLM with Nemotron on one ThinkStation
 
-## Goal
+## Purpose
 
-Learn the profiling workflow and establish a baseline for a single serving
-engine. The Mac currently runs `llama3.1:8b` via Ollama; it does **not** run the
-vendored vLLM/CUDA engine. Treat the Mac run as an API smoke test. Establish a
-separate vLLM baseline on GB10 when available, using the same 27B checkpoint,
-engine build and configuration intended for the later comparison.
+Establish a reproducible, single-worker baseline using the unmodified vLLM
+engine and `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-NVFP4` on a GB10
+ThinkStation. This checkpoint uses NVFP4 **weights**; its KV-cache dtype is a
+separate setting. Record the effective stock KV dtype and all settings: stock
+may resolve to BF16 or another format, so it is not automatically distinct
+from the explicit precision experiments.
 
-## Local practice run
+Nothing in this guide has been verified on the venue's actual hardware. The
+existing laptop smoke test uses Ollama and Llama, not vLLM or this model.
 
-Follow [the installation instructions](../profiling/README.md), make sure
-Ollama is running and lists `llama3.1:8b`, and run from the repository root:
+## 1. Prepare and verify
+
+1. Ask the Fuzzball operator to start one persistent GPU worker on one node and
+   provide its OpenAI-compatible endpoint, metrics endpoint, image, model mount,
+   and permitted authentication method. The second node should not run a
+   competing serving worker during these single-engine measurements.
+2. Choose and record an exact vLLM commit/image digest, driver/CUDA versions,
+   model and tokenizer revisions, model load format, GPU identity, memory,
+   max context, batching, prefix caching, speculative decoding, and sampling
+   settings. Confirm the image actually runs the repo's vendored revision if
+   claiming that it does. The [NVIDIA model card](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-NVFP4)
+   provides a vLLM recipe and recommends a DGX Spark container; compatibility
+   with our particular version and GB10 setup still requires a real test.
+3. For **stock**, do not specify a KV-cache override; record the actual resolved
+   dtype, scale source and attention backend from logs/instrumentation. The
+   model is hybrid Mamba/attention; check which layers/state use KV cache and
+   record Mamba state dtypes separately. Do not assume all state is BF16/FP8.
+4. Verify `/v1/models`, a short streaming completion, server token usage,
+   `/metrics`, context capacity and worker health. Increase context and
+   concurrency gradually and record OOMs. Keep thinking mode and output
+   semantics fixed across experiments; generated reasoning tokens count too.
+
+## 2. Install AIPerf and run a pilot
+
+On a reachable client, install AIPerf as described in [profiling/README.md](../profiling/README.md).
+Set the following placeholders for the actual deployment. A local tokenizer
+directory from the pinned model revision is preferable. Supply credentials by
+the venue-approved method and never commit or print them.
 
 ```sh
-sh profiling/local-smoke.sh
+WORKER_URL='http://WORKER_HOST:8000'
+SERVED_MODEL='YOUR_SERVED_MODEL_NAME'
+TOKENIZER='/path/to/pinned/tokenizer'
+RUN_DIR='results/stock-8k-256-c1-rep1'
+
+.venv-aiperf/bin/aiperf profile \
+  --model "$SERVED_MODEL" --url "$WORKER_URL" \
+  --endpoint-type chat --streaming --tokenizer "$TOKENIZER" \
+  --use-server-token-count --concurrency 1 --request-count 5 \
+  --warmup-request-count 1 --isl 8192 --osl 256 \
+  --random-seed 42 --extra-inputs temperature:0 \
+  --artifact-dir "$RUN_DIR" --ui none
 ```
 
-This sends one warmup and five measured streaming requests at concurrency 1.
-Results are written to a timestamped `results/local-smoke-*` folder. Review
-`profile_export_aiperf.csv`, `profile_export.jsonl`, `inputs.json` and the log.
-Server token usage is used for metrics, but synthetic prompt length is
-approximate because the script uses a different tokenizer. The output limit
-is a cap; generation can stop early. No server metrics or GPU profiling is
-enabled in this smoke test.
+This is a pilot, not an explicitly cold test: warmup may populate caches.
+`--osl` is a target/cap, not a guarantee of generated length. Check actual
+server usage and whether the server accepts AIPerf's output-limit parameter;
+use `--use-legacy-max-tokens` only if the server needs it. Add
+`--server-metrics http://METRICS_HOST:PORT/metrics` if the real metrics
+endpoint is separate and accessible. AIPerf flags shown are for 0.13.0.
 
-## Single vLLM worker on GB10
+## 3. Collect the baseline matrix
 
-Follow sections 1–3 of the [GB10 runbook](GB10-RUNBOOK.md): confirm the exact
-27B checkpoint is supported by the pinned vLLM build, launch the worker via the
-venue's Fuzzball workflow, and verify streaming, token usage, effective dtype
-and model identity. Run the short AIPerf example in that guide with the
-matching tokenizer and verified endpoint. Begin with one small context and
-gradually increase length and concurrency. Save the manifest and raw results;
-record failures, actual output length and cache state.
+Use fixed traces or saved seeded inputs and record their hash. Pilot context
+sizes 8k and 65k, short and long output targets, and concurrency 1 and 2;
+expand as capacity permits to context 8k/32k/65k/130k, output target
+256/1024/4096 and concurrency 1/2/4. Context plus output must fit the model
+limit; cache occupancy and hybrid state may constrain concurrency. Repeat
+important cells at least three times. Save actual input/output lengths,
+workload and cache state, errors and repetitions, not just requested values.
 
-Use the same stock engine and settings for the later BF16/FP8 tests. AIPerf's
-client TTFT includes queueing and network delay; it is not direct GPU prefill
-time. Collect server timing or GPU traces separately if available.
+For cold runs use unique prefixes and verify cache hits are zero; warm the
+model separately without contaminating measured prefixes. For warm sessions,
+prefill a known prefix and replay follow-ups on the same worker, verifying
+cache reuse via available server data. A synthetic single-turn pilot does not
+measure warm sessions. Reset caches only with a verified venue-supported method.
 
-## Graph and compare
+## 4. Record and graph
 
-- Plot individual request TTFT and total latency, with units and sample count.
-- Plot output tokens/s and completed requests/s at each tested concurrency.
-- Plot input and output token counts so short or early-ended generations are
-  visible; flag failed or timed-out requests.
-- Compare repeated runs of the **same** worker and workload to understand
-  variability. The Mac and GB10 use different hardware, model and runtime:
-  show them as separate demonstrations, not a controlled speed comparison.
+Capture client TTFT, inter-token latency, end-to-end latency, output tokens/s,
+request throughput, actual input/output/cached tokens, status and errors;
+collect worker queue depth, active sequences, cache occupancy, prefill/decode
+timings, utilization, memory, clocks and temperature where actually available.
+Client TTFT includes queue/network, not pure prefill. Use server instruments
+or GPU profiling for internal timing and bandwidth; mark unavailable values
+null. AIPerf alone cannot observe every kernel or cache value.
 
-Five Mac requests are not enough for meaningful tail-latency claims. Reserve
-the GB10 baseline's raw files for the matched comparisons in step 2.
+Save each run's raw JSONL, summaries, trace hash, metadata, Git commit and
+dirty state, image/model/tokenizer revisions, settings and warmup/cache method.
+Keep secrets out. `results/` is ignored: archive results to team-approved
+storage, such as VAST if provisioned. Plot TTFT and end-to-end latency versus
+context, decode throughput versus context, output and concurrency, and
+failures. Include sample counts and variation. This stock baseline is the
+reference for [step 2](02-kv-precision-comparison.md).
