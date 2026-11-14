@@ -13,6 +13,10 @@ from .timing import ServiceTime
 logger = logging.getLogger("precision_split.routing")
 
 
+class WorkerUnavailable(Exception):
+    """No eligible worker, or a session's pinned worker is unavailable."""
+
+
 @dataclass
 class Reservation:
     request_id: str
@@ -48,7 +52,7 @@ class GreedyRouter:
         running = max(0.0, head.service_seconds - (now - head.started_at))
         return running + sum(item.service_seconds for item in queue[1:])
 
-    async def reserve(self, session_id, input_length, expected_output_length):
+    async def reserve(self, session_id, input_length, expected_output_length, *, eligible_workers=None):
         async with self._lock:
             now = self.clock()
             scores = {}
@@ -63,8 +67,13 @@ class GreedyRouter:
                 }
             worker = self._sessions.get(session_id)
             reason = "session_affinity"
+            eligible = set(scores) if eligible_workers is None else set(eligible_workers) & set(scores)
+            if worker is not None and worker not in eligible:
+                raise WorkerUnavailable(f"Session worker {worker} is unavailable")
             if worker is None:
-                worker = min(scores, key=lambda name: (scores[name]["predicted_finish_seconds"], name))
+                if not eligible:
+                    raise WorkerUnavailable("No healthy worker is available")
+                worker = min(eligible, key=lambda name: (scores[name]["predicted_finish_seconds"], name))
                 reason = "minimum_predicted_finish_time"
             assignment = Assignment(uuid.uuid4().hex, session_id, worker, reason, scores)
             queue = self._queues[worker]

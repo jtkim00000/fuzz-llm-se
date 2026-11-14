@@ -1,5 +1,7 @@
 import argparse
+import json
 import logging
+from pathlib import Path
 
 import uvicorn
 
@@ -21,13 +23,21 @@ def main():
             command.add_argument("--bf16-url", default="http://127.0.0.1:9101")
             command.add_argument("--fp8-url", default="http://127.0.0.1:9102")
             command.add_argument("--worker-timeout", type=float, default=30.0)
+    real = commands.add_parser("vllm-gateway", help="Route real OpenAI-compatible vLLM requests")
+    real.add_argument("--config", required=True)
+    real.add_argument("--host", default="127.0.0.1")
+    real.add_argument("--port", type=int, default=19000)
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
-    timings = load_timings(args.timings)
-    if args.command == "worker":
+    if args.command == "vllm-gateway":
+        from .vllm_gateway import create_vllm_gateway
+        app = create_vllm_gateway(json.loads(Path(args.config).read_text()))
+    elif args.command == "worker":
+        timings = load_timings(args.timings)
         app = create_worker(args.mode, timings)
     else:
+        timings = load_timings(args.timings)
         app = create_gateway(timings, {"bf16": args.bf16_url, "fp8": args.fp8_url}, timeout=args.worker_timeout)
     # One process owns each in-memory queue / reservation ledger.
     uvicorn.run(app, host=args.host, port=args.port, workers=1, access_log=False)

@@ -4,6 +4,11 @@ Two independent mock HTTP workers and one gateway. No model weights, GPU,
 vLLM, or Fuzzball are needed. BF16/FP8 are simulation labels; the delays are
 invented demo parameters, not measurements of precision performance.
 
+For the real two-GB10 Qwen deployment, API URL and connection commands, see
+the [Fuzzball PrecisionSplit guide](../deploy/fuzzball/PRECISIONSPLIT.md).
+This page documents the local mock mode; `vllm-gateway` is the separate real
+OpenAI-compatible mode.
+
 ## The three processes
 
 The client sends requests to one gateway address. The gateway chooses a worker
@@ -253,7 +258,7 @@ snapshot for inspection.
 | [`demo.py`](demo.py) | Exercise and verify all three routing cases over HTTP |
 | [`../tests/test_precision_split.py`](../tests/test_precision_split.py) | Concurrency, affinity, FIFO and failure/cancellation checks |
 
-## Current limits and failures
+## Mock-mode limits and failures
 
 The prototype scores both configured workers without backend health filtering.
 Upstream failures return 502, or 504 for timeouts, with no automatic retry or
@@ -285,22 +290,24 @@ one with BF16 attention KV and the other with supported, verified FP8 KV using
 the [launch profiles](../docs/precision-profiles.md). Model weight format and
 Mamba state dtypes are separate settings. Each engine owns its GPU cache.
 
-Before using the real workers:
+The real request adapter is now implemented in `vllm_gateway.py` and
+`VLLMForwarder` in `forwarding.py`, including token counting, health filtering,
+streaming and reservation cleanup. The
+[deployment guide](../deploy/fuzzball/PRECISIONSPLIT.md) records the running
+services and tested connection path. The remaining production/benchmark work is:
 
 1. Obtain individually addressable worker URLs, served model IDs, metrics URLs,
    and approved authentication. A second load balancer must preserve the
    selected worker rather than independently redistributing the request.
-2. Adapt `forwarding.py` to vLLM's `/v1/chat/completions` and accept real messages
-   in `apps.py`. Add authentication, token counting and streaming; keep a
-   reservation alive until its stream ends or termination is confirmed.
+2. Use the `vllm-gateway` mode for `/v1/chat/completions` and real messages.
+   The original mock `gateway` mode continues to serve `/infer`. Supply the
+   approved authentication for the chosen network route.
 3. Replace invented timing coefficients with matched benchmark estimates and
    live queue/cache/load signals. vLLM batches requests, so the serial FIFO
    estimate in this demo must be revised and validated against real workloads.
 4. Preserve session affinity, verify effective worker configuration and cache
    behavior, then compare routed results with direct-to-worker baselines.
 
-Changing `--bf16-url` and `--fp8-url` alone is insufficient: the current adapter
-still calls the mock `/infer` route. This README describes that current mock
-implementation and the required migration work; it does not deploy GPU engines
-or modify any Fuzzball workflow. See the [gateway experiment guide](../docs/03-gateway-system.md)
+Changing `--bf16-url` and `--fp8-url` alone in mock `gateway` mode is insufficient:
+that adapter still calls `/infer`. See the [gateway experiment guide](../docs/03-gateway-system.md)
 for the later profiling and evaluation plan.

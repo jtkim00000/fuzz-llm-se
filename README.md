@@ -13,6 +13,10 @@ predicted-finish scores, atomic load reservations, and session affinity.
 It needs no model weights, GPU, vLLM, or Fuzzball. Both timing rules and HTTP
 worker addresses are configurable.
 
+The [real Fuzzball deployment guide](deploy/fuzzball/PRECISIONSPLIT.md) documents
+the CPU gateway connected to the two GB10 Qwen workers, authentication and
+verified streaming/session-routing tests.
+
 ## Open WebUI
 
 Open WebUI is included as a Docker Compose service. Start it with:
