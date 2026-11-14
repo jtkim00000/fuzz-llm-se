@@ -1,3 +1,5 @@
 .env
 .venv-aiperf/
 results/
+__pycache__/
+*.py[cod]

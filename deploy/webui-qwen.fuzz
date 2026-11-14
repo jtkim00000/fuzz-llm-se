@@ -1,0 +1,33 @@
+version: v4
+services:
+  open-webui:
+    persist: true
+    image:
+      uri: docker://ghcr.io/open-webui/open-webui:main
+    env:
+      - ENABLE_OPENAI_API=true
+      - OPENAI_API_BASE_URL=http://192.168.99.13:18000/v1
+      - OPENAI_API_KEY=none
+      - AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=30
+      - PORT=18080
+      - RAG_EMBEDDING_ENGINE=ollama
+    script: |
+      #!/bin/sh
+      cd /app/backend
+      exec bash start.sh
+    resource:
+      cpu:
+        cores: 2
+      memory:
+        size: 4GiB
+    network:
+      ports:
+        - name: web
+          port: 18080
+          protocol: tcp
+      endpoints:
+        - name: web
+          port-name: web
+          type: subdomain
+          protocol: http
+          scope: user
