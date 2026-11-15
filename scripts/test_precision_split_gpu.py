@@ -12,7 +12,7 @@ import uuid
 import httpx
 
 
-async def check(url, token=None, ca_file=None):
+async def check(url, token=None, ca_file=None, disable_thinking=False):
     headers = {"Authorization": "Bearer " + token} if token else {}
     context = ssl.create_default_context()
     if ca_file:
@@ -27,12 +27,13 @@ async def check(url, token=None, ca_file=None):
         model = response.json()["data"][0]["id"]
         prefix = "gpu-check-" + uuid.uuid4().hex[:10]
         sessions = [prefix + "-a", prefix + "-b"]
+        template = {"chat_template_kwargs": {"enable_thinking": False}} if disable_thinking else {}
 
         async def submit(session, prompt, limit):
             started = time.monotonic()
             response = await client.post("v1/chat/completions", headers={"X-Session-ID": session}, json={
                 "model": model, "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": limit, "temperature": 0,
+                "max_tokens": limit, "temperature": 0, **template,
             })
             response.raise_for_status()
             body = response.json()
@@ -53,6 +54,7 @@ async def check(url, token=None, ca_file=None):
             "model": model, "messages": [{"role": "user", "content": "Reply with READY."}],
             "max_tokens": 8, "temperature": 0, "stream": True,
             "stream_options": {"include_usage": True},
+            **template,
         }) as response:
             response.raise_for_status()
             streaming_worker = response.headers["x-precisionsplit-worker"]
@@ -81,7 +83,7 @@ async def check(url, token=None, ca_file=None):
             await asyncio.sleep(0.1)
         assert all(w["assigned_requests"] == 0 for w in state["workers"].values())
         return {"passed": True, "checked_at": datetime.now(timezone.utc).isoformat(),
-                "gateway_url": url, "model": model, "health": health.json(),
+                "gateway_url": url, "model": model, "thinking_disabled_for_smoke": disable_thinking, "health": health.json(),
                 "concurrent": concurrent, "followup": followup,
                 "streaming": {"worker": streaming_worker, "done": done, "content": content,
                               "usage": usage, "first_content_seconds": first_content},
@@ -93,10 +95,11 @@ def main():
     parser.add_argument("--url", required=True)
     parser.add_argument("--token-file", type=Path)
     parser.add_argument("--ca-file", type=Path, help="Approved cluster CA; TLS verification remains enabled")
+    parser.add_argument("--disable-thinking", action="store_true", help="Send enable_thinking=false for short controlled smoke tests")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     token = args.token_file.read_text().strip() if args.token_file else None
-    report = asyncio.run(check(args.url, token, args.ca_file))
+    report = asyncio.run(check(args.url, token, args.ca_file, args.disable_thinking))
     text = json.dumps(report, indent=2) + "\n"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

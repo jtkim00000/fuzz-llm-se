@@ -1,0 +1,66 @@
+{
+  "version": "v4",
+  "volumes": {
+    "model": {
+      "use": "team2",
+      "name": "qwen38-27b-shared"
+    }
+  },
+  "services": {
+    "vllm": {
+      "env": [
+        "HF_HUB_OFFLINE=1",
+        "HF_HOME=/tmp/hf-cache"
+      ],
+      "image": {
+        "uri": "docker://vllm/vllm-openai:v0.28.0"
+      },
+      "mounts": {
+        "/models": {
+          "volume": "model"
+        }
+      },
+      "script": "#!/bin/sh\nset -eu\ntest -f /models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80/VERIFIED.json\npython3 - <<'PY'\nimport json, torch, vllm\nfrom pathlib import Path\np=Path(\"/models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80\")\nm=json.loads((p/\"VERIFIED.json\").read_text())\nassert m[\"complete\"] and m[\"revision\"]==\"482ca0f3832238542f8f5295dde86b5f22711d80\"\nprint(json.dumps({\"event\":\"worker_start\",\"checkpoint\":str(p),\"revision\":m[\"revision\"],\"vllm\":vllm.__version__,\"gpu\":torch.cuda.get_device_name(0),\"free_total_bytes\":torch.cuda.mem_get_info()}),flush=True)\nPY\nexec vllm serve /models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80 \\\n  --served-model-name nvidia/Qwen3.8-27B-NVFP4 \\\n  --tensor-parallel-size 1 --pipeline-parallel-size 1 \\\n  --dtype bfloat16 --kv-cache-dtype fp8 \\\n  --max-model-len 8192 --max-num-seqs 4 --max-num-batched-tokens 2048 \\\n  --gpu-memory-utilization 0.6 --kv-cache-memory-bytes 8589934592 \\\n  --enforce-eager --language-model-only \\\n  --enable-auto-tool-choice --tool-call-parser qwen3_coder --reasoning-parser qwen3 \\\n  --host 0.0.0.0 --port 18027\n",
+      "network": {
+        "ports": [
+          {
+            "name": "api",
+            "port": 18027,
+            "protocol": "tcp"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "api",
+            "type": "subdomain",
+            "scope": "group",
+            "protocol": "http",
+            "port-name": "api"
+          }
+        ]
+      },
+      "persist": true,
+      "resource": {
+        "cpu": {
+          "cores": 8
+        },
+        "memory": {
+          "size": "80GiB"
+        },
+        "devices": {
+          "nvidia.com/gpu": 1
+        }
+      },
+      "readiness-probe": {
+        "http-get": {
+          "path": "/health",
+          "port": 18027
+        },
+        "period-seconds": 15,
+        "timeout-seconds": 5,
+        "failure-threshold": 80,
+        "initial-delay-seconds": 30
+      }
+    }
+  }
+}

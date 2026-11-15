@@ -11,7 +11,7 @@ from precision_split.timing import ServiceTime, load_timings
 
 
 class RoutingTests(unittest.IsolatedAsyncioTestCase):
-    async def test_simultaneous_arrivals_see_prior_reservations_and_break_ties_by_name(self):
+    async def test_simultaneous_arrivals_see_prior_reservations_and_rotate_ties(self):
         router = GreedyRouter({w: ServiceTime(1, 0, 0) for w in ("fp8", "bf16")}, clock=lambda: 0)
         assignments = await asyncio.gather(*(router.reserve(f"session-{i}", 0, 0) for i in range(6)))
         self.assertEqual([a.worker for a in assignments], ["bf16", "fp8"] * 3)
@@ -38,29 +38,36 @@ class RoutingTests(unittest.IsolatedAsyncioTestCase):
         router = GreedyRouter(load_timings(), clock=lambda: 0)
         first = await router.reserve("original", 10, 10)
         await router.release(first)
-        busy = await router.reserve("busy", 1000, 500)
+        busy = await router.reserve("original", 1000, 500)
         overflow = await router.reserve("new", 10, 10)
         await router.release(overflow)
         followup = await router.reserve("original", 10, 10)
         self.assertEqual((first.worker, busy.worker, overflow.worker, followup.worker), ("bf16", "bf16", "fp8", "bf16"))
         self.assertEqual(followup.reason, "session_affinity")
-        self.assertGreater(followup.scores["bf16"]["predicted_finish_seconds"], followup.scores["fp8"]["predicted_finish_seconds"])
+        self.assertGreater(followup.scores["bf16"]["assigned_requests_before"], followup.scores["fp8"]["assigned_requests_before"])
         self.assertEqual((await router.snapshot())["workers"]["bf16"]["assigned_requests"], 2)
 
-    async def test_input_and_output_lengths_can_change_idle_worker_choice(self):
-        timings = {"bf16": ServiceTime(0, 0.1, 0.01), "fp8": ServiceTime(0, 0.01, 0.1)}
-        router = GreedyRouter(timings, clock=lambda: 0)
-        prefill = await router.reserve("long-input", 100, 1)
-        self.assertEqual(prefill.worker, "fp8")
-        await router.release(prefill)
-        decode = await router.reserve("long-output", 1, 100)
-        self.assertEqual(decode.worker, "bf16")
+    async def test_counts_override_timings_even_after_estimate_expires(self):
+        now = [0.0]
+        router = GreedyRouter({"bf16": ServiceTime(0.01, 0, 0),
+                               "fp8": ServiceTime(100, 0, 0)}, clock=lambda: now[0])
+        first = await router.reserve("long-running", 0, 0)
+        now[0] = 500
+        second = await router.reserve("new", 0, 0)
+        self.assertEqual((first.worker, second.worker), ("bf16", "fp8"))
+        self.assertEqual(second.reason, "least_outstanding_requests")
+        await router.release(first)
+        await router.release(second)
+        third = await router.reserve("idle-a", 1000, 1)
+        await router.release(third)
+        fourth = await router.reserve("idle-b", 1, 1000)
+        self.assertEqual((third.worker, fourth.worker), ("bf16", "fp8"))
 
     async def test_failed_queued_reservation_does_not_reset_running_progress(self):
         now = [0.0]
         router = GreedyRouter({"bf16": ServiceTime(2, 0, 0), "fp8": ServiceTime(100, 0, 0)}, clock=lambda: now[0])
         await router.reserve("a", 0, 0)
-        queued = await router.reserve("b", 0, 0)
+        queued = await router.reserve("a", 0, 0)
         now[0] = 0.5
         await router.release(queued, "failed")
         self.assertEqual((await router.snapshot())["workers"]["bf16"]["estimated_remaining_seconds"], 1.5)

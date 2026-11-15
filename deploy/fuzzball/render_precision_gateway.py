@@ -10,9 +10,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=ROOT / "deploy/fuzzball/precision-split-qwen.json")
+    parser.add_argument("--config", type=Path, default=ROOT / "deploy/fuzzball/precision-split-qwen38.json")
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--port", type=int, default=19000)
+    parser.add_argument("--port", type=int, default=19038)
     args = parser.parse_args()
     source = {p.name: p.read_text() for p in (ROOT / "precision_split").iterdir()
               if p.suffix == ".py" or p.name == "timings.json"}

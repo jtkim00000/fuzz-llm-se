@@ -1,0 +1,24 @@
+{
+  "model": "nvidia/Qwen3.8-27B-NVFP4",
+  "max_model_len": 8192,
+  "worker_timeout": 180,
+  "estimate_source": "hand_set_uncalibrated_linear_heuristic_not_regression",
+  "workers": {
+    "bf16": {
+      "url": "http://192.168.99.12:18027",
+      "timing": {
+        "base_seconds": 0.05,
+        "input_seconds_per_token": 0.001,
+        "output_seconds_per_token": 0.04
+      }
+    },
+    "fp8": {
+      "url": "http://192.168.99.13:18027",
+      "timing": {
+        "base_seconds": 0.05,
+        "input_seconds_per_token": 0.001,
+        "output_seconds_per_token": 0.04
+      }
+    }
+  }
+}

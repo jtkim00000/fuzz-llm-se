@@ -37,12 +37,15 @@ class Assignment:
 
 
 class GreedyRouter:
+    """Greedily minimize outstanding requests; retain timing diagnostics only."""
+
     def __init__(self, timings: dict[str, ServiceTime], *, clock=time.monotonic):
         self.timings = timings
         self.clock = clock
         self._lock = asyncio.Lock()
         self._queues = {worker: [] for worker in sorted(timings)}
         self._sessions = {}
+        self._next_worker = 0
 
     def _remaining(self, worker, now):
         queue = self._queues[worker]
@@ -73,8 +76,13 @@ class GreedyRouter:
             if worker is None:
                 if not eligible:
                     raise WorkerUnavailable("No healthy worker is available")
-                worker = min(eligible, key=lambda name: (scores[name]["predicted_finish_seconds"], name))
-                reason = "minimum_predicted_finish_time"
+                names = sorted(self._queues)
+                order = names[self._next_worker:] + names[:self._next_worker]
+                # Stable min uses this rotating order only when counts tie.
+                worker = min((name for name in order if name in eligible),
+                             key=lambda name: len(self._queues[name]))
+                self._next_worker = (names.index(worker) + 1) % len(names)
+                reason = "least_outstanding_requests"
             assignment = Assignment(uuid.uuid4().hex, session_id, worker, reason, scores)
             queue = self._queues[worker]
             queue.append(Reservation(
@@ -111,6 +119,7 @@ class GreedyRouter:
         async with self._lock:
             now = self.clock()
             return {
+                "routing_policy": "least_outstanding_requests",
                 "workers": {worker: {
                     "assigned_requests": len(queue),
                     "estimated_remaining_seconds": self._remaining(worker, now),
