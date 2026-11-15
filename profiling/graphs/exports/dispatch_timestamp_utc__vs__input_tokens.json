@@ -1,0 +1,27 @@
+{
+  "x": "input_tokens",
+  "y": "dispatch_timestamp_utc",
+  "precisions": [
+    "bf16",
+    "fp8"
+  ],
+  "colors": {
+    "bf16": "#2166AC",
+    "fp8": "#D6604D"
+  },
+  "sources": {
+    "bf16": "1b566207c4c3e1baaf2fde6c8a294ef5d2468f1c:profiling/results/bf16-fp8-vast-reactome-c4-100-2026-11-14/bf16/measurement/canonical-requests.jsonl",
+    "fp8": "1b566207c4c3e1baaf2fde6c8a294ef5d2468f1c:profiling/results/bf16-fp8-vast-reactome-c4-100-2026-11-14/fp8/measurement/canonical-requests.jsonl"
+  },
+  "timestamp_mode": "seconds_since_first_dispatch_per_run",
+  "counts": {
+    "bf16": {
+      "plotted": 100,
+      "attempts": 100
+    },
+    "fp8": {
+      "plotted": 100,
+      "attempts": 100
+    }
+  }
+}
