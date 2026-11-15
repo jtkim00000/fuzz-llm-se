@@ -1,4 +1,9 @@
-# Matched BF16 and FP8 VAST Reactome profile
+# Deprecated: matched direct-node BF16 and FP8 VAST Reactome profile
+
+Preserved historical direct-node profile. Do not use it as the active campaign
+input: it has one long-context/input shape, a 128-token cap with mostly short
+natural outputs, and no gateway path. The raw records and local seed model stay
+here for audit and reproducibility.
 
 This directory contains two independent direct-vLLM runs completed on 2026-11-14:
 `bf16/` targets SPARK03 and `fp8/` targets SPARK04.  Each has 100 attempts at
