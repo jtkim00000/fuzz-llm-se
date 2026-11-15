@@ -1,0 +1,44 @@
+{
+  "policy": "single",
+  "concurrency": 4,
+  "sample_interval_seconds": 0.2,
+  "metrics_timeout_seconds": 3,
+  "request_timeout_seconds": 900,
+  "cache_condition": "gateway-path; prefix cache state unverified",
+  "workers": [
+    {
+      "id": "gateway",
+      "url": "http://192.168.99.13:19038",
+      "health_url": "http://192.168.99.13:19038/health",
+      "model": "nvidia/Qwen3.8-27B-NVFP4",
+      "manifest_path": "/results/gateway-scenario1-stock-2026-11-15/manifests/gateway.json",
+      "manifest": {
+        "scenario": 1,
+        "gateway_policy": "least_outstanding_requests",
+        "gateway_url": "http://192.168.99.13:19038",
+        "gateway_worker_aliases": {
+          "bf16": "http://192.168.99.12:18027",
+          "fp8": "http://192.168.99.13:18027"
+        },
+        "actual_worker_configuration": "stock dtype auto; KV cache dtype auto",
+        "worker_workflows": {
+          "stock_a": "00dfc1a3-4d2f-45c2-8585-ebe359a04571",
+          "stock_b": "b1b2876e-4ecd-40d8-8574-9ea9fb9bf30c"
+        },
+        "model_checkpoint": "nvidia/Qwen3.8-27B-NVFP4",
+        "model_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+        "max_model_len": 8192,
+        "max_num_seqs": 4,
+        "max_num_batched_tokens": 2048,
+        "gpu_memory_utilization": 0.6,
+        "kv_cache_memory_bytes": 8589934592,
+        "effective_configuration_verified": true,
+        "telemetry_limitations": [
+          "gateway exposes no per-worker Prometheus running/waiting counters",
+          "gateway response header records selected alias"
+        ]
+      },
+      "configuration_hash": "51ae412cd9a3bdab941618caec2b3695d12b31357de67e43146d89f2a3de00ef"
+    }
+  ]
+}

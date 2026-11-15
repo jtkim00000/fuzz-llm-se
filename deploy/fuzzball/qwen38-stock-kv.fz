@@ -1,0 +1,63 @@
+version: v4
+volumes:
+  model:
+    use: team2
+    name: qwen38-27b-shared
+services:
+  vllm:
+    env:
+      - HF_HUB_OFFLINE=1
+      - HF_HOME=/tmp/hf-cache
+    image:
+      uri: docker://vllm/vllm-openai:v0.28.0
+    mounts:
+      /models:
+        volume: model
+    script: |
+      #!/bin/sh
+      set -eu
+      MODEL=/models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80
+      test -f "$MODEL/VERIFIED.json"
+      python3 - <<'PY'
+      import json, torch, vllm
+      from pathlib import Path
+      p=Path('/models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80')
+      m=json.loads((p/'VERIFIED.json').read_text())
+      assert m['complete'] and m['revision']=='482ca0f3832238542f8f5295dde86b5f22711d80'
+      print(json.dumps({'event':'worker_start','configuration':'stock_dtype_auto_kv_auto','checkpoint':str(p),'revision':m['revision'],'vllm':vllm.__version__,'gpu':torch.cuda.get_device_name(0),'free_total_bytes':torch.cuda.mem_get_info()}),flush=True)
+      PY
+      exec vllm serve "$MODEL" \
+        --served-model-name nvidia/Qwen3.8-27B-NVFP4 \
+        --tensor-parallel-size 1 --pipeline-parallel-size 1 \
+        --max-model-len 8192 --max-num-seqs 4 --max-num-batched-tokens 2048 \
+        --gpu-memory-utilization 0.6 --kv-cache-memory-bytes 8589934592 \
+        --enforce-eager --language-model-only \
+        --enable-auto-tool-choice --tool-call-parser qwen3_coder --reasoning-parser qwen3 \
+        --host 0.0.0.0 --port 18027
+    network:
+      ports:
+        - name: api
+          port: 18027
+          protocol: tcp
+      endpoints:
+        - name: api
+          port-name: api
+          type: subdomain
+          protocol: http
+          scope: group
+    persist: true
+    resource:
+      cpu:
+        cores: 8
+      memory:
+        size: 80GiB
+      devices:
+        nvidia.com/gpu: 1
+    readiness-probe:
+      http-get:
+        path: /health
+        port: 18027
+      initial-delay-seconds: 30
+      period-seconds: 15
+      timeout-seconds: 5
+      failure-threshold: 80

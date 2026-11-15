@@ -1,0 +1,10 @@
+{
+  "run_id": "scenario1-stock-gateway-c4-r3-2026-11-15",
+  "attempts": 24,
+  "succeeded": 24,
+  "failed": 0,
+  "field_missing_counts": {
+    "running_requests_at_dispatch": 24,
+    "waiting_requests_at_dispatch": 24
+  }
+}

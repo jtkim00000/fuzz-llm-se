@@ -1,0 +1,22 @@
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[{"index":0,"delta":{"role":"assistant","content":""},"logprobs":null,"finish_reason":null}],"prompt_token_ids":null,"prompt_text":null}
+
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[{"index":0,"delta":{"content":"R"},"logprobs":null,"finish_reason":null,"token_ids":null}]}
+
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[{"index":0,"delta":{"content":"-D"},"logprobs":null,"finish_reason":null,"token_ids":null}]}
+
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[{"index":0,"delta":{"content":"RE"},"logprobs":null,"finish_reason":null,"token_ids":null}]}
+
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[{"index":0,"delta":{"content":"-"},"logprobs":null,"finish_reason":null,"token_ids":null}]}
+
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[{"index":0,"delta":{"content":"8"},"logprobs":null,"finish_reason":null,"token_ids":null}]}
+
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[{"index":0,"delta":{"content":"9"},"logprobs":null,"finish_reason":null,"token_ids":null}]}
+
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[{"index":0,"delta":{"content":"5"},"logprobs":null,"finish_reason":null,"token_ids":null}]}
+
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[{"index":0,"delta":{"content":"3"},"logprobs":null,"finish_reason":"length","stop_reason":null,"token_ids":null}]}
+
+data: {"id":"chatcmpl-bfc674632af22301","object":"chat.completion.chunk","created":1794759834,"model":"nvidia/Qwen3.8-27B-NVFP4","choices":[],"usage":{"prompt_tokens":7175,"total_tokens":7183,"completion_tokens":8,"completion_tokens_details":{"reasoning_tokens":0}},"system_fingerprint":"vllm-0.28.0-079c38b9"}
+
+data: [DONE]
+

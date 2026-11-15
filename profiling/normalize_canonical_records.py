@@ -29,6 +29,7 @@ def main():
             if values[key] is None: missing.append(key)
         out.append({'run_id':a.run_id,'request_id':row['request_id'],'logical_request_id':turn.get('logical_request_id',row['request_id']),
             'session_id':row['session_id'],'group_id':row['group_id'],'turn_index':row['turn_index'],'worker_id':row.get('selected_worker'),
+            'gateway_routed_worker':labels.get('gateway_routed_worker'),
             **values,'input_token_count_source':'local_pinned_tokenizer_chat_template','server_input_tokens':labels.get('actual_input_tokens'),
             'output_token_count_source':'server_stream_usage' if labels.get('output_tokens') is not None else 'missing',
             'status':'succeeded' if labels.get('success') else 'failed','finish_reason':labels.get('finish_reason'),

@@ -36,6 +36,9 @@ def completion(worker,messages,turn,timeout):
              'X-Request-ID':turn['request_id'],'X-Session-ID':turn['session_id'],**headers(worker)})
         with urllib.request.urlopen(req,timeout=timeout) as response:
             result['http_status']=response.status
+            # A gateway may identify its selected upstream worker in a response
+            # header. This is an observed routing outcome, not an online feature.
+            result['gateway_routed_worker']=response.headers.get('X-PrecisionSplit-Worker') or response.headers.get('X-Routed-Node')
             def consume(event):
                 nonlocal usage,finish,content,reasoning
                 events.append(event)
