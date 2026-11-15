@@ -1,2 +1,3 @@
 # Shared FastAPI/httpx/uvicorn pins; no model-serving dependencies.
 -r requirements-local-workers.txt
+prometheus-client==0.24.1

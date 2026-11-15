@@ -51,22 +51,22 @@ async def run_demo(gateway_url):
         preferred = idle["routing"]["worker"]
         other = next(w for w in initial["workers"] if w != preferred)
         scores = idle["routing"]["scores"]
-        assert scores[preferred]["estimated_service_seconds"] < scores[other]["estimated_service_seconds"]
+        assert all(score["assigned_requests_before"] == 0 for score in scores.values())
 
-        busy_session = prefix + "-busy"
+        busy_session = idle_session
         busy_task = asyncio.create_task(infer(busy_session, 1000, 500))
         followup_task = None
         try:
-            assigned = await wait_for(state, lambda s: busy_session in s["sessions"], "busy assignment")
+            assigned = await wait_for(state, lambda s: s["workers"][preferred]["assigned_requests"] == 1, "busy assignment")
             assert assigned["sessions"][busy_session] == preferred, "Use the supplied default timing rules for this demo"
             worker_url = initial["worker_urls"][preferred]
             await wait_for(lambda: state(worker_url), lambda s: s["running_request_id"] is not None, "worker start")
 
             overflow = await infer(prefix + "-overflow")
             assert overflow["routing"]["worker"] == other
-            assert overflow["routing"]["reason"] == "minimum_predicted_finish_time"
+            assert overflow["routing"]["reason"] == "least_outstanding_requests"
             scores = overflow["routing"]["scores"]
-            assert scores[other]["predicted_finish_seconds"] < scores[preferred]["predicted_finish_seconds"]
+            assert scores[other]["assigned_requests_before"] < scores[preferred]["assigned_requests_before"]
 
             followup_task = asyncio.create_task(infer(idle_session))
             queued = await wait_for(state, lambda s: s["workers"][preferred]["assigned_requests"] == 2,
@@ -76,7 +76,7 @@ async def run_demo(gateway_url):
             assert followup["routing"]["worker"] == preferred
             assert followup["routing"]["reason"] == "session_affinity"
             scores = followup["routing"]["scores"]
-            assert scores[preferred]["predicted_finish_seconds"] > scores[other]["predicted_finish_seconds"]
+            assert scores[preferred]["assigned_requests_before"] > scores[other]["assigned_requests_before"]
             assert scores[other]["assigned_requests_before"] == 0
             assert busy["result"]["sequence"] < followup["result"]["sequence"]
             assert followup["result"]["queue_wait_seconds"] > 0
@@ -100,7 +100,7 @@ def main():
     report = asyncio.run(run_demo(args.gateway_url))
     for label in ("idle", "overflow", "followup"):
         decision = report[label]["routing"]
-        scores = {mode: round(score["predicted_finish_seconds"], 4)
+        scores = {mode: round(score["assigned_requests_before"], 4)
                   for mode, score in decision["scores"].items()}
         print(f"{label}: scores={scores} -> {decision['worker']} ({decision['reason']})")
     print("PASS: FIFO follow-up queued behind busy work; all reservations released")

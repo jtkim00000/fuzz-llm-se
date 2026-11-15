@@ -29,7 +29,7 @@ def build(run_dirs, out):
     samples=[]; paired={}; sources={}
     for run_dir in run_dirs:
         run_dir=Path(run_dir); requests={r['request_id']:r for r in rows(run_dir/'requests.jsonl')}
-        trace={t['request_id']:t for s in rows(run_dir/'trace.jsonl') for t in s['turns']}
+        trace={t['request_id']:{**t,'session_group':s.get('group_id',s['session_id'])} for s in rows(run_dir/'trace.jsonl') for t in s['turns']}
         sources[str(run_dir)]={'requests_sha256':hashlib.sha256((run_dir/'requests.jsonl').read_bytes()).hexdigest(),
                                'trace_sha256':hashlib.sha256((run_dir/'trace.jsonl').read_bytes()).hexdigest()}
         for request_id,request in requests.items():
@@ -39,7 +39,9 @@ def build(run_dirs, out):
             features={key:candidate['features'].get(key) for key in FEATURES}
             labels=request['labels']
             worker_manifest=request['candidate_worker_manifests'][chosen]
-            group='logical:'+turn.get('logical_request_id',request_id)
+            # One prompt across both precisions AND concurrency blocks stays together.
+            # Real multi-turn sessions inherit their enclosing session group.
+            group=turn['session_group']
             split=split_for(group)
             sample={'request_id':request_id,'logical_request_id':turn.get('logical_request_id',request_id),
                 'session_id':request['session_id'],'group_id':group,'split':split,'worker_id':chosen,
@@ -52,7 +54,7 @@ def build(run_dirs, out):
                     'error_type':labels.get('error_type'),'finish_reason':labels.get('finish_reason')},
                 'pre_dispatch_snapshot_ns':candidate['snapshot'].get('sample_completed_ns'),
                 'dispatch_ns':request['dispatch_ns'],'completion_ns':request['completed_ns']}
-            if sample['pre_dispatch_snapshot_ns'] > sample['dispatch_ns']:
+            if not isinstance(sample['pre_dispatch_snapshot_ns'],int) or sample['pre_dispatch_snapshot_ns'] > sample['dispatch_ns']:
                 raise ValueError('Future telemetry state detected')
             samples.append(sample)
             paired.setdefault(sample['logical_request_id'],{})[chosen]=sample
@@ -70,7 +72,7 @@ def build(run_dirs, out):
         'matched_logical_requests':len(pairs),'split_counts':counts,
         'features_online_allowlist':FEATURES,
         'labels_not_online_features':['ttft_ms','e2e_ms','success','slo_met','output_tokens','actual_input_tokens','error_type','finish_reason'],
-        'warning':'This seed data has one matched run per precision and one workload family. Train for pipeline validation only; collect the planned multi-load campaign before promotion.'},indent=2)+'\n')
+        'warning':'Controlled seed data from one workload family, not counterfactual queue labels. Pipeline validation only; held-out mixed-gateway traffic and independent quality evidence are required before promotion.'},indent=2)+'\n')
     return counts
 
 

@@ -1,140 +1,164 @@
-# Running PrecisionSplit on the two GB10 nodes
+# PrecisionSplit on two GB10 nodes: Qwen3.8 27B
 
-Deployment verified November 14, 2026. This is real Qwen inference through
-PrecisionSplit, with two GPU workers and a CPU gateway. The local mock demo
-remains available separately in [`precision_split/README.md`](../../precision_split/README.md).
+NVIDIA's [Qwen3.8-27B-NVFP4](https://huggingface.co/nvidia/Qwen3.8-27B-NVFP4)
+runs on two GPU workers behind a one-core CPU gateway. For the local mock
+demo, see [precision_split/README.md](../../precision_split/README.md).
 
-| Service | Fuzzball workflow ID | Node | Resources |
+Updated November 15, 2026: the BF16 and FP8 workers were canceled. Two
+explicit FP16 attempts were subsequently canceled by another user/session,
+which launched the stock replacements below. At the user's request, these
+stock replacements are left running. Runtime logs report BF16 compute and
+automatic KV dtype. The original gateway workflow and endpoint are preserved.
+Startup status is `started`; this replacement pair has not been smoke-tested
+in this session. Earlier routing results apply to the previous worker pair.
+
+| Service | Workflow ID | Node | Resources |
 | --- | --- | --- | --- |
-| Existing Qwen worker | `34067792-1bbd-42fe-9c94-11373c9fcef4` | CIQ-CHI-SPARK04 | 1 GPU, 8 CPU cores, 34 GiB requested memory |
-| New FP8-KV Qwen worker | `6778fb91-dcca-4ca9-b5d0-143a0356cf39` | CIQ-CHI-SPARK03 | 1 GPU, 8 CPU cores, 34 GiB requested memory |
-| PrecisionSplit gateway | `56378649-c8fa-4de9-8982-b66dc1fb7fce` | CIQ-CHI-SPARK04 | 1 CPU core, 2 GiB memory, no GPU allocation |
+| Stock worker A (legacy slot `bf16`) | `00dfc1a3-4d2f-45c2-8585-ebe359a04571` | CIQ-CHI-SPARK04 | 1 GPU, 8 CPU cores, 80 GiB requested memory |
+| Stock worker B (legacy slot `fp8`) | `b1b2876e-4ecd-40d8-8574-9ea9fb9bf30c` | CIQ-CHI-SPARK03 | 1 GPU, 8 CPU cores, 80 GiB requested memory |
+| Gateway | `4a8b8149-fb63-4dfa-9890-84736bcd3b1c` | CIQ-CHI-SPARK04 | 1 CPU core, 2 GiB, no GPU |
 
-Both engines serve `Qwen/Qwen2.5-Coder-7B-Instruct-AWQ` using stock vLLM 0.28.0.
-They mount the existing persistent `qwen25-awq` volume at `/data` and use
-`/data/qwen--qwen2.5-coder-7b-instruct-awq`. No second model download was started.
-The original worker was not restarted or reconfigured.
+## Same checkpoint, two stock workers
 
-The original worker reports FP16 compute, automatic KV dtype and FLASH_ATTN.
-The new worker reports FP16 compute, FP8 KV, and FLASHINFER; its runtime log
-resolves KV storage to `torch.float8_e4m3fn` on `sm121`. This is **not** a matched
-BF16-versus-FP8 experiment. FP8 calibration and comparative correctness remain
-unverified. It also uses the existing Qwen checkpoint rather than the proposed
-Nemotron NVFP4 checkpoint.
+Both API model IDs are `nvidia/Qwen3.8-27B-NVFP4`. Both engines use vLLM
+0.28.0 and revision `482ca0f3832238542f8f5295dde86b5f22711d80`.
+The existing `qwen38-27b-shared` persistent volume is mounted at `/models`;
+the checkpoint directory is
+`/models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80`.
+Its existing `VERIFIED.json` records 21,945,291,730 bytes, 19 files and
+completion/checksums. No new download was needed for this replacement.
 
-## Connect from the Mac
+Weights retain NVIDIA's mixed NVFP4/FP8 checkpoint format. The stock workers
+omit explicit compute/KV dtype overrides. Their startup logs resolve compute
+to `torch.bfloat16` and KV configuration to `auto`; they are not FP16 workers.
+No FP16 inference test completed before the explicit FP16 pair was canceled.
 
-The gateway API base URL is:
+The gateway's existing `bf16` and `fp8` names are now legacy route-slot labels,
+not descriptions of the workers' actual precision. Keeping those labels,
+addresses and port preserves the gateway process and its session map.
+
+Common settings: 8,192-token context; maximum 4 sequences and 2,048 batched
+tokens per scheduler iteration; 8 GiB cache allocation; tensor/pipeline
+parallelism 1; eager execution; text-only mode; prefix caching and chunked
+prefill enabled; no speculative decoding. Explicit cache bytes take precedence
+over GPU memory utilization. Both replacement workers select FLASH_ATTN.
+Functional smoke tests do not establish accuracy or comparative performance.
+
+## Connect and test from the Mac
+
+API base URL:
 
 ```text
-https://endpoint-fb03aca68aaefd98969be3de947e134c26f2b448.endpoints.fb-hack.civilfritz.net/v1
+https://endpoint-f2584b6a68a012358ec3b09dce917a280fd7d082.endpoints.fb-hack.civilfritz.net/v1
 ```
 
-The endpoint has Fuzzball `user` scope. A short-lived endpoint token was saved
-on this Mac at `.local-inference/precision-split/gateway-token`, with mode
-`0600`. The approved cluster root CA is at
-`.local-inference/precision-split/cluster-ca.crt`; it was retrieved through
-authenticated workflow execution from Fuzzball's published node trust store.
-These files are ignored by Git. No certificate verification was disabled and
-the Mac's global trust configuration was not changed.
-
-To refresh the token using the existing Fuzzball login, from the repo root:
+This is a Fuzzball user-scoped endpoint. Refresh its two-hour token using the
+existing Fuzzball login, from the repo root:
 
 ```sh
 .venv-precisionsplit/bin/python deploy/fuzzball/authorize_endpoint.py \
-  --endpoint-id endpoint-fb03aca68aaefd98969be3de947e134c26f2b448 \
-  --output .local-inference/precision-split/gateway-token
+  --endpoint-id endpoint-f2584b6a68a012358ec3b09dce917a280fd7d082 \
+  --output .local-inference/precision-split/greedy-gateway-token
 ```
 
-The default lifetime is two hours. The helper prints only the protected file
-path and expiry duration. API clients present the token in the Authorization
-bearer header. Obtain the approved CA and access token through the team's
-approved channel when connecting from another machine; neither belongs in a
-manifest or source file.
-
-Run the same four-request smoke test used for verification:
+The token file has mode 0600. The approved cluster CA is at
+`.local-inference/precision-split/cluster-ca.crt`. Both files are ignored by
+Git; TLS verification remains enabled. API clients send an Authorization
+bearer token. Use the team's approved channel for credentials on another
+machine; credential values do not belong in chat, source, or a manifest.
 
 ```sh
 .venv-precisionsplit/bin/python scripts/test_precision_split_gpu.py \
-  --url https://endpoint-fb03aca68aaefd98969be3de947e134c26f2b448.endpoints.fb-hack.civilfritz.net \
-  --token-file .local-inference/precision-split/gateway-token \
+  --url https://endpoint-f2584b6a68a012358ec3b09dce917a280fd7d082.endpoints.fb-hack.civilfritz.net \
+  --token-file .local-inference/precision-split/greedy-gateway-token \
   --ca-file .local-inference/precision-split/cluster-ca.crt \
-  --output results/precision-split-cluster/mac-smoke.json
+  --disable-thinking \
+  --output results/greedy-gateway-2026-11-15/mac-smoke.json
 ```
 
-This sends two concurrent 64-token-capped requests, one 8-token-capped follow-up
-and one 8-token-capped streaming request. It checks that both workers handle
-traffic, affinity holds, streaming ends with `[DONE]`, and reservations return
-to zero. This is a functional smoke test, not a performance or accuracy study.
+The test sends two concurrent 64-token-capped requests, an 8-token follow-up
+and an 8-token streaming request. It checks both workers, session affinity,
+a completed stream and zero remaining reservations. Thinking is disabled
+for these short tests through `chat_template_kwargs.enable_thinking=false`.
+Otherwise it is a request-level choice; a tiny output cap can be consumed by
+reasoning before an answer appears. This test is not a performance study.
 
-## API and routing
+## Routing on the greedy-gateway branch
 
-- `GET /health`: live checks of both backends; HTTP 200 when at least one is healthy.
-- `GET /state`: reservation counts, session assignments, health, model and estimate source.
-- `GET /v1/models`: served model discovery.
-- `POST /v1/chat/completions`: normal chat payloads, including tools and streaming.
+This section records the policy in the existing running workflow. The current
+repository's `vllm-gateway` now uses the saved E2E predictor on its normal
+request path; see [predictive routing](../../precision_split/PREDICTIVE_ROUTING.md).
+The bundle has been validated, but that source change has not been rolled into
+the running Fuzzball service or its existing public URL.
 
-Use the exact model ID above. Supply `X-Session-ID` on requests for conversation
-affinity, or reuse the generated ID returned in the response's `X-Session-ID`.
-The response also carries `X-PrecisionSplit-Worker` (`existing` or `fp8`) and
-`X-PrecisionSplit-Request-ID`. The gateway does not store conversation messages;
-clients must send the required history.
+New sessions select the healthy worker with fewer outstanding requests,
+including running and queued requests. Ties rotate between workers. Counts
+are reserved atomically before HTTP forwarding and released on completion,
+failure or cancellation; streaming holds its count until closure. Follow-ups
+stay on the pinned worker and count toward its load too. No timing estimator
+or regression output influences this decision. Existing timing fields are
+retained for diagnostics and mock delays.
 
-The real adapter checks backend health, tokenizes the actual messages, reserves
-load atomically, and forwards to the selected worker. Streaming bytes pass
-through unchanged; the reservation stays active until the stream closes.
-An unhealthy pinned worker produces 503 rather than silently migrating the
-session. The gateway does not automatically retry generation.
+This balances counts, not execution cost. One long request still counts as
+one, and session affinity can make the split uneven. Worker-direct traffic
+is not counted. Keep one gateway process while load/session state is local.
 
-Both workers currently have the same initial timing heuristic:
+The live gateway embeds this branch's least-outstanding-request implementation.
+Local edits require a new gateway deployment to take effect.
 
-```text
-service seconds = 0.05 + 0.001 * input tokens + 0.04 * output budget
-```
+## API, configuration and deployment
 
-The coefficients are **uncalibrated**. The gateway uses the existing serial
-remaining-work approximation; real vLLM continuously batches requests. Routing
-mechanics are verified, but prediction quality, saturation behavior, optimality
-and any precision speedup have not been established. Replace the coefficients
-and load model with benchmark-derived estimates and telemetry before those
-claims. Keep one gateway process while its reservation/session state is local.
+- `GET /health`: both backend health checks; 200 when at least one is healthy.
+- `GET /state`: reservations, session pins, health, model and estimate source.
+- `GET /v1/models`: exact served model discovery.
+- `POST /v1/chat/completions`: messages, tools and streaming.
 
-## Configuration and deployment source
+Supply `X-Session-ID` for affinity or reuse its returned value. Responses
+also include `X-PrecisionSplit-Worker` (`bf16` or `fp8`) and
+`X-PrecisionSplit-Request-ID`.
 
-[`precision-split-qwen.json`](precision-split-qwen.json) contains the worker
-addresses and estimates. The verified private-cluster routes are
-`http://192.168.99.13:18000` and `http://192.168.99.12:18000`. These direct routes
-avoid an intermediary load balancer. After worker rescheduling, verify placement
-and update the routes as needed; these are node addresses, not service discovery.
+[precision-split-qwen38.json](precision-split-qwen38.json) configures
+`http://192.168.99.13:18027` (stock A, legacy `bf16` slot) and
+`http://192.168.99.12:18027` (stock B, legacy `fp8` slot).
+The gateway listens on 19038. These private node addresses must be checked
+and updated after rescheduling. From the Mac use the authenticated HTTPS URL.
 
-[`qwen-fp8-kv.fz`](qwen-fp8-kv.fz) reproduces the new worker. Do not submit a
-duplicate while its GPU allocation is already running.
-
-[`render_precision_gateway.py`](render_precision_gateway.py) packages the local
-Python sources and configuration into a Fuzzball workflow:
+[qwen38-fp16-kv.fz](qwen38-fp16-kv.fz) records the canceled explicit FP16
+attempts; it does not reproduce the current stock workers. The BF16 and FP8
+Fuzzfiles also remain historical examples.
+Each requests one GPU. Placement put them on separate nodes; these files
+do not contain unique node-affinity labels. Do not start duplicate services
+while current allocations are running.
 
 ```sh
 .venv-precisionsplit/bin/python deploy/fuzzball/render_precision_gateway.py \
-  --output results/precision-split-cluster/gateway-next.fz
-fuzzball workflow validate results/precision-split-cluster/gateway-next.fz
+  --output results/greedy-gateway-2026-11-15/gateway-next.fz
+fuzzball workflow validate results/greedy-gateway-2026-11-15/gateway-next.fz
 ```
 
-Generating/validating a file does not update the running service. Coordinate a
-gateway replacement before submitting a new copy, including port placement.
-The current gateway reuses the cached vLLM container's HTTP dependencies but
-does not load a model or request a GPU. Source/configuration are embedded in
-the submitted workflow, so subsequent local edits require a new deployment.
+Rendering/validation does not update a running service. Replacement needs a
+new deployment, port planning and new endpoint credentials. Source/config
+are embedded in the Fuzzfile. The CPU gateway reuses the cached vLLM image's
+HTTP dependencies without loading a model or requesting a GPU.
 
-The real adapter lives in [`vllm_gateway.py`](../../precision_split/vllm_gateway.py)
-and `VLLMForwarder` in [`forwarding.py`](../../precision_split/forwarding.py).
-Shared atomic reservation/affinity logic remains in
-[`routing.py`](../../precision_split/routing.py).
+See [routing.py](../../precision_split/routing.py) for atomic reservations,
+[forwarding.py](../../precision_split/forwarding.py) for HTTP forwarding and
+[vllm_gateway.py](../../precision_split/vllm_gateway.py) for the real API.
+Earlier BF16/FP8 test records are in `results/greedy-gateway-2026-11-15/`; object-cache copies
+use `fb://group/precision-split/4a8b8149-fb63-4dfa-9890-84736bcd3b1c/`
+with seven-day TTL. Credentials are excluded.
 
-The deployment record, cluster/Mac smoke results, startup evidence and routing
-logs are under `results/precision-split-cluster/` on this Mac. No credentials are
-included in those artifacts.
+Superseded Qwen2.5 workflows: `34067792-1bbd-42fe-9c94-11373c9fcef4`
+(FP16/auto KV), `6778fb91-dcca-4ca9-b5d0-143a0356cf39` (FP8 KV), and
+gateway `56378649-c8fa-4de9-8982-b66dc1fb7fce`.
+All three superseded workflows are confirmed canceled. Historical files
+`qwen-fp8-kv.fz` and `precision-split-qwen.json` still describe Qwen2.5;
+current renderer defaults use Qwen3.8.
 
-Deployment and cluster smoke records are also saved in the Fuzzball object
-cache under `fb://group/precision-split/56378649-c8fa-4de9-8982-b66dc1fb7fce/`
-with a seven-day TTL. Use `object_get` or `object_download` through the MCP to
-retrieve them from another session.
+The immediately preceding Qwen3.8 workflows
+`52626fae-3879-4559-85c0-d2de4a124f96` (BF16 KV) and
+`346f74e3-9826-45dc-adab-6bc95067fcc4` (FP8 KV) were canceled for this
+replacement. Their test records remain in `results/greedy-gateway-2026-11-15/`.
+
+Canceled FP16 attempts: `b0245156-566a-4796-b5cc-1207514b4c95` and
+`cb9eae51-9223-4efc-a3c3-21cd49128559`. Both report `cancelled by user`.

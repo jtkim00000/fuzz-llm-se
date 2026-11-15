@@ -1,6 +1,7 @@
 """HTTP transport; has no routing policy or load accounting."""
 
 import os
+import time
 
 import httpx
 
@@ -66,3 +67,22 @@ class VLLMForwarder(WorkerForwarder):
         request = self.client.build_request("POST", self.urls[worker] + "/v1/chat/completions",
                                             json=payload, headers=self.headers[worker])
         return await self.client.send(request, stream=True)
+
+    async def snapshot(self, worker, info):
+        """Completed-before-dispatch exporter sample; missing values stay missing."""
+        snapshot = {"sample_started_ns": time.time_ns(), "state": {}}
+        mapping = info.get("metric_map", {
+            "running_requests": {"metric": "vllm:num_requests_running"},
+            "queued_requests": {"metric": "vllm:num_requests_waiting"},
+            "kv_cache_usage": {"metric": "vllm:kv_cache_usage_perc"},
+        })
+        try:
+            from profiling.telemetry import parse_metrics
+            response = await self.client.get(info.get("metrics_url", self.urls[worker] + "/metrics"),
+                                             headers=self.headers[worker], timeout=2)
+            response.raise_for_status()
+            snapshot["state"], _ = parse_metrics(response.text, mapping)
+        except (httpx.HTTPError, ValueError, KeyError) as error:
+            snapshot["error"] = type(error).__name__
+        snapshot["sample_completed_ns"] = time.time_ns()
+        return snapshot

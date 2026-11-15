@@ -1,0 +1,91 @@
+{
+  "split_method": "complete session groups with stable hash assignments",
+  "warnings": [
+    "success: no outcome variation; do not claim a useful reliability classifier"
+  ],
+  "splits": {
+    "train": {
+      "rows": 200,
+      "groups": 50
+    },
+    "validation": {
+      "rows": 52,
+      "groups": 13
+    },
+    "test": {
+      "rows": 36,
+      "groups": 9
+    }
+  },
+  "targets": {
+    "ttft_ms": {
+      "status": "trained",
+      "feature_importance_note": "Compare to held-out baselines; do not tune on test data.",
+      "validation": {
+        "n": 52,
+        "mae_ms": 295.6400402479389,
+        "constant_baseline_error": 1672.739924369266,
+        "by_precision_error": {
+          "other_or_unknown": 324.91891245677704,
+          "fp8": 266.3611680391007
+        }
+      },
+      "test": {
+        "n": 36,
+        "mae_ms": 602.5926865459681,
+        "constant_baseline_error": 1366.2227731744192,
+        "by_precision_error": {
+          "other_or_unknown": 627.1931834720168,
+          "fp8": 577.9921896199196
+        }
+      }
+    },
+    "e2e_ms": {
+      "status": "trained",
+      "feature_importance_note": "Compare to held-out baselines; do not tune on test data.",
+      "validation": {
+        "n": 52,
+        "mae_ms": 1751.6600112895492,
+        "constant_baseline_error": 15404.660428888465,
+        "by_precision_error": {
+          "other_or_unknown": 1726.220195846691,
+          "fp8": 1777.0998267324076
+        }
+      },
+      "test": {
+        "n": 36,
+        "mae_ms": 1635.5685859350986,
+        "constant_baseline_error": 17708.622329561065,
+        "by_precision_error": {
+          "other_or_unknown": 1387.285614331658,
+          "fp8": 1883.851557538539
+        }
+      }
+    },
+    "slo_met": {
+      "status": "unavailable_insufficient_labels"
+    },
+    "success": {
+      "status": "constant_single_class_no_reliability_validation",
+      "feature_importance_note": "Compare to held-out baselines; do not tune on test data.",
+      "validation": {
+        "n": 52,
+        "brier_score": 0.0,
+        "constant_baseline_error": 0.0,
+        "by_precision_error": {
+          "other_or_unknown": 0.0,
+          "fp8": 0.0
+        }
+      },
+      "test": {
+        "n": 36,
+        "brier_score": 0.0,
+        "constant_baseline_error": 0.0,
+        "by_precision_error": {
+          "other_or_unknown": 0.0,
+          "fp8": 0.0
+        }
+      }
+    }
+  }
+}

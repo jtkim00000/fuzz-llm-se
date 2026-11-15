@@ -1,6 +1,9 @@
 """Explicit pre-dispatch feature allowlist and portable forest inference."""
 import math
-from telemetry import STATE_FIELDS
+try:
+    from .schema import STATE_FIELDS
+except ImportError:
+    from schema import STATE_FIELDS
 REQUEST_FEATURES=['estimated_cached_tokens','input_tokens_estimate','output_limit','estimated_total_tokens','previous_turns',
                  'streaming','tool_call_mode','structured_output','thinking_enabled','priority','slo_ttft_ms','slo_e2e_ms']
 FEATURES=REQUEST_FEATURES+['precision_fp8','precision_bf16','client_outstanding_requests','state_age_ms']+STATE_FIELDS
