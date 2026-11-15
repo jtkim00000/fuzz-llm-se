@@ -1,0 +1,17 @@
+{
+  "trace_sha256": "62709b8cbdbaa5f7453d0837fd18afb3a987cf3c3a27aea52e4c27d425da10ce",
+  "collector_sha256": "b56b13fb3a2d232a4da6fdabe42e92a3c3bc9fdc3af1aa38f843963710ec85cb",
+  "features_sha256": "093d231bf3efd32d7f64c0dec3c9efa0d7708a0341719f16a7b698e101f4fd66",
+  "code_hashes": {
+    "telemetry.py": "342ac582e3223c33cb641467f89b33d5bf04e76e65c111887503bfd8ab63ca5b",
+    "collect_training.py": "b56b13fb3a2d232a4da6fdabe42e92a3c3bc9fdc3af1aa38f843963710ec85cb",
+    "normalize_canonical_records.py": "630515da4d6a481b5131397fcf90e26c5300977790e47a29a05850da76c5e817",
+    "grade.py": "7c078e0ddeb8fb35dfc68f1b2b08d6ad5066e51f8a814ce45d72ca0b88b26a7c",
+    "features.py": "093d231bf3efd32d7f64c0dec3c9efa0d7708a0341719f16a7b698e101f4fd66"
+  },
+  "tokenizer": "/models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80",
+  "cache_condition": "gateway-path; pre-existing engine warm-up; prefix cache state unverified",
+  "client_hostname": "run",
+  "started_ns": 1794763125097158630,
+  "timing_notes": "SSE chunks are not guaranteed single tokens; ITL percentiles remain null."
+}

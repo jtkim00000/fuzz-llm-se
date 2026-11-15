@@ -1,0 +1,32 @@
+version: v4
+volumes:
+  results:
+    use: team2
+    name: profiling-results
+  export:
+    use: ephemeral
+    size: 2GiB
+    egress:
+      - source:
+          uri: file://gateway-scenario4-predictive-bf16-fp8-2026-11-15.tar.gz
+        destination:
+          uri: fb://group/benchmark-exports/gateway-scenario4-predictive-bf16-fp8-2026-11-15.tar.gz
+jobs:
+  verify-and-export:
+    image:
+      uri: docker://alpine:3.20
+    mounts:
+      /results: results
+      /export: export
+    resource:
+      cpu:
+        cores: 1
+      memory:
+        size: 512MiB
+    script: |
+      #!/bin/sh
+      set -eu
+      ROOT=/results/gateway-scenario4-predictive-bf16-fp8-2026-11-15
+      test -f "$ROOT/gateway-state-after.json"
+      test "$(find "$ROOT" -name requests.jsonl -exec wc -l {} + | awk 'END {print $1}')" = 144
+      tar -C /results -czf /export/gateway-scenario4-predictive-bf16-fp8-2026-11-15.tar.gz gateway-scenario4-predictive-bf16-fp8-2026-11-15

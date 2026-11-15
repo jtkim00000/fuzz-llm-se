@@ -1,0 +1,28 @@
+{
+  "attempted": 24,
+  "planned_requests": 24,
+  "not_attempted_after_session_failure": 0,
+  "successes": 24,
+  "failures": 0,
+  "duration_seconds": 144.43948276100127,
+  "completed_requests_per_second": 0.1661595537538162,
+  "output_tokens_per_second": 23.926975740549533,
+  "client_delay_p95_ms": 160.3437210999999,
+  "session_migrations": 0,
+  "unavailable_or_overload_selections": 0,
+  "ttft_ms_p50": 2225.939111000116,
+  "ttft_ms_p95": 4836.3715567496,
+  "ttft_ms_p99": 5308.005302359707,
+  "e2e_ms_p50": 21354.366525999467,
+  "e2e_ms_p95": 42045.11232419872,
+  "e2e_ms_p99": 45126.100793599704,
+  "slo_attainment": null,
+  "accuracy_pass_rate": null,
+  "goodput": null,
+  "accuracy_by_category": {
+    "vast_reactome_controlled_catalogue": {
+      "n": 0,
+      "passed": 0
+    }
+  }
+}
