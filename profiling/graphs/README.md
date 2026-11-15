@@ -1,45 +1,80 @@
-# Interactive request scatter plots
+# Input-token scatter viewer
 
-Launch from the repository root using the existing environment:
+From the repository root:
 
 ```sh
 .venv-aiperf/bin/python profiling/graphs/request_scatter.py
 ```
 
-The right panel lets you select either or both precisions, choose one of four input axes and five output axes, and edit colors (name or hex, then press Enter). Click **Export graph PDF** to save only the graph, without the control panel, in `profiling/graphs/exports`. The exported filename identifies the axes and selected precisions; repeating the same export overwrites that file. The terminal prints its full path.
+X is fixed to **pre-dispatch input tokens**. Choose one of five Y variables:
+end-to-end latency, TTFT, actual output tokens, dispatch time, or completion time.
+Four independent checkboxes control BF16 scatter/regression and FP8
+scatter/regression. Edit color names or hex strings and press Enter.
 
-Twenty graph-only PDFs are already generated in `exports`, covering every input/output combination with both precisions. Each has a JSON sidecar recording its source, units through field names/labels, selected precisions, colors and point counts.
+## Controls
 
-## Inputs and reproducibility
+- **Exclude outliers (%)**: fit a baseline line separately for each precision,
+  rank absolute vertical residuals, remove the largest `floor(n * percent / 100)`,
+  then refit once. Excluded points disappear from BOTH scatter and regression,
+  including exported PDFs. Zero restores all finite observations. This does not
+  delete or modify source data. Ties follow finite-pair source row order.
+- **X min/max, Y min/max**: enter finite numeric bounds with min < max and press
+  Enter. **Auto axes** chooses bounds for the currently visible retained data.
+  Changing Y or layer visibility resets bounds; colors and exclusion edits preserve
+  the current bounds. Click Auto axes after exclusion if you want a tighter view.
+- Side panel: retained/excluded counts, slope, intercept, retained-set R²/RMSE and
+  full-data R². Linear fits need at least three retained points and two distinct X
+  values. Scatter visibility and zoom do not affect the observations used to fit.
+- **Export graph PDF**: saves only the graph and simple layer legend, with current
+  visibility, exclusion, colors and bounds. Statistics stay out of the PDF and are
+  retained in its JSON sidecar, along with source references and exclusion indices.
 
-The default source is the matched 100-request BF16/FP8 result folder. If that folder is absent from your current checkout, the script reads the canonical records directly from the locally fetched `origin/profiling/bf16-fp8-request-records` Git ref. It does not fetch, switch branches, modify results or launch inference jobs. Git-sourced exports record the resolved commit. An existing local result folder takes precedence.
+Exclusion is exploratory outcome-based selection, not improved predictive accuracy.
+Retain and report the full-data baseline, exclusion method and percentage when
+sharing a trimmed analysis. Slow requests may reflect real serving behavior.
 
-You can replace both inputs explicitly:
+## Data sources and command-line options
+
+Default data: matched 100-request BF16/FP8 result folder under `profiling/results`.
+If absent from the checkout, the script reads the committed records directly from
+`origin/profiling/bf16-fp8-request-records` without checkout or network access.
+The resolved commit is saved for Git-sourced exports. Local files take precedence.
 
 ```sh
 .venv-aiperf/bin/python profiling/graphs/request_scatter.py \
   --bf16 /path/to/bf16/canonical-requests.jsonl \
   --fp8 /path/to/fp8/canonical-requests.jsonl \
-  --bf16-color '#2166AC' --fp8-color '#D6604D' \
-  --precisions bf16 fp8 --output-dir /path/to/plots
+  --layers bf16_scatter bf16_regression fp8_regression \
+  --trim-percent 5 --output-dir /path/to/plots
 ```
 
-Use `--precisions bf16` or `--precisions fp8` to initially display just one. The checkboxes can change that after launch. `--x` and `--y` accept canonical field names; see `--help`. `--results-dir` accepts a directory containing `bf16/measurement/canonical-requests.jsonl` and `fp8/measurement/canonical-requests.jsonl`.
-
-To regenerate all 20 PDFs without opening the UI:
+`--results-dir` accepts a parent containing `bf16/measurement/canonical-requests.jsonl`
+and the corresponding FP8 path. `--y` selects a canonical output field. `--regression`
+enables linear lines alongside scatter; explicit `--layers` overrides it.
+`--bf16-color` and `--fp8-color` accept color names/hex. There is no X-variable
+selector or `--x` option now.
 
 ```sh
-.venv-aiperf/bin/python profiling/graphs/request_scatter.py --export-all
+.venv-aiperf/bin/python profiling/graphs/request_scatter.py --export-all --regression
 ```
 
-## Interpretation
+Batch export now generates **five** input-token plots, one per output. Previously
+created 20-plot exports are left untouched; old files for other X variables are
+historical. Repeated exports to the same filename overwrite that file.
 
-- Every finite X/Y pair is plotted, without aggregation, fitting or jitter. Legend counts show plotted rows / total attempts. Missing values are omitted pairwise, never replaced with zero. Both precision files currently contain 100 successful attempts each.
-- Latency and TTFT are converted from milliseconds to seconds.
-- Dispatch and completion timestamps are converted to seconds since the first dispatch **within each run**. Completion time uses that same dispatch origin, preserving duration. These axes show scheduling/progress, not per-request runtime; select end-to-end latency for runtime. Absolute UTC timestamps remain in source files.
-- Running/waiting counts are pre-dispatch samples, not instantaneous measurements. Sample ages can reach about a second in these runs.
-- All output limits equal 128, so those plots are vertical stacks. Integer load counts also overlap. Transparency and different marker shapes help, but coincident points can obscure one another.
-- The input range is narrow (5,889–6,200 tokens). These graphs do not establish broad context-length scaling or causality.
-- Precision labels identify deployed configurations; attention backends and physical workers differ. Quality checks passed only 3% in each run and require investigation separately.
+## Timing, interpretation and responsiveness
 
-Dependencies: Python 3.10+, NumPy and Matplotlib. The existing `.venv-aiperf` was used here (NumPy 2.4.6, Matplotlib 3.11.2). For a separate environment install `requirements.txt`. Interactive use requires a working desktop Matplotlib backend; `--export-all` uses the noninteractive Agg backend.
+Latency and TTFT are seconds; source milliseconds are converted. Dispatch and
+completion times are seconds since each run's first dispatch, not runtimes.
+Missing/nonfinite pairs are omitted rather than changed to zero. The current
+input range is narrow and these single-variable fits do not establish causality.
+
+Parsed arrays and fits are cached per loaded dataset. Plot artists are reused,
+axis text synchronization avoids redundant immediate renders, and the legend uses
+a fixed position. This reduces repeated computation and redraw overhead. Restart
+or reload the script to use modified input files; there is no live file watcher.
+
+Dependencies: Python 3.10+, NumPy, Matplotlib (see requirements.txt). The existing
+`.venv-aiperf` environment supports this script. Interactive operation requires a
+desktop Matplotlib backend; batch export uses Agg. Original profiling results are
+never modified by the viewer.
