@@ -1,0 +1,24 @@
+{
+  "model": "Qwen/Qwen2.5-Coder-7B-Instruct-AWQ",
+  "max_model_len": 32768,
+  "worker_timeout": 120,
+  "estimate_source": "uncalibrated_initial_heuristic_not_a_performance_benchmark",
+  "workers": {
+    "existing": {
+      "url": "http://192.168.99.13:18000",
+      "timing": {
+        "base_seconds": 0.05,
+        "input_seconds_per_token": 0.001,
+        "output_seconds_per_token": 0.04
+      }
+    },
+    "fp8": {
+      "url": "http://192.168.99.12:18000",
+      "timing": {
+        "base_seconds": 0.05,
+        "input_seconds_per_token": 0.001,
+        "output_seconds_per_token": 0.04
+      }
+    }
+  }
+}

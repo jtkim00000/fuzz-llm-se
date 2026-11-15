@@ -1,0 +1,187 @@
+version: v4
+volumes:
+  data:
+    ingress:
+    - source:
+        uri: hf://nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-NVFP4?revision=6efb4a2a1c1fa277ce7b3df7a1416255011b1c99
+      destination:
+        uri: file://models/nvidia--nvidia-nemotron-3-nano-30b-a3b-nvfp4@6efb4a2a1c1fa277ce7b3df7a1416255011b1c99
+      policy:
+        timeout:
+          execute: 2h
+services:
+  vllm:
+    persist: true
+    image:
+      uri: docker://nvcr.io/nvidia/vllm:25.12.post1-py3
+    mounts:
+      /data:
+        volume: data
+    env:
+    - HF_HUB_OFFLINE=1
+    - HF_HOME=/data/.cache/huggingface
+    - VLLM_USE_FLASHINFER_MOE_FP4=1
+    - VLLM_FLASHINFER_MOE_BACKEND=throughput
+    - VLLM_NO_USAGE_STATS=1
+    - HF_HUB_DISABLE_TELEMETRY=1
+    - PROFILING_CHECKPOINT=nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-NVFP4
+    - PROFILING_MODEL_REVISION=6efb4a2a1c1fa277ce7b3df7a1416255011b1c99
+    - PROFILING_MODEL_PATH=/data/models/nvidia--nvidia-nemotron-3-nano-30b-a3b-nvfp4@6efb4a2a1c1fa277ce7b3df7a1416255011b1c99
+    script: |
+      #!/bin/sh
+      set -eu
+      cp "/data/models/nvidia--nvidia-nemotron-3-nano-30b-a3b-nvfp4@6efb4a2a1c1fa277ce7b3df7a1416255011b1c99/nano_v3_reasoning_parser.py" /data/nano_v3_reasoning_parser.py
+      python3 /opt/collect-worker-provenance.py
+      # The parallelism layout is decided at runtime: whether the model is
+      # MoE is a property of the downloaded snapshot's config.json, which
+      # exists only after ingress, never at render time.
+      detect=$(python3 - <<'PY'
+      import json
+      cfg = json.load(open("/data/models/nvidia--nvidia-nemotron-3-nano-30b-a3b-nvfp4@6efb4a2a1c1fa277ce7b3df7a1416255011b1c99/config.json"))
+      arch = (cfg.get("architectures") or ["unknown"])[0]
+      KEYS = ("num_local_experts", "n_routed_experts", "num_experts", "moe_num_experts")
+      def moe(c):
+          return any(isinstance(c.get(k), int) and c[k] > 1 for k in KEYS)
+      # The expert count sits at the top level, or in a nested config block:
+      # text_config for multimodal models, ffn_config for DBRX.
+      nested = [v for v in cfg.values() if isinstance(v, dict)]
+      print(("moe" if moe(cfg) or any(moe(v) for v in nested) else "dense"), arch)
+      PY
+      ) || { echo "ERROR: cannot read /data/models/nvidia--nvidia-nemotron-3-nano-30b-a3b-nvfp4@6efb4a2a1c1fa277ce7b3df7a1416255011b1c99/config.json to detect the model architecture" >&2; exit 1; }
+      is_moe=${detect%% *}
+      arch=${detect#* }
+
+      use_ep=0
+      if [ "false" = "true" ]; then
+        if [ "$is_moe" != "moe" ]; then
+          echo "ERROR: ExpertParallelism=true, but model 'nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-NVFP4' (architecture: $arch)" \
+               "is not a mixture-of-experts model: config.json has no expert-count field" \
+               "(num_local_experts, n_routed_experts, num_experts, moe_num_experts) greater than 1." \
+               "Use ExpertParallelism=auto or ExpertParallelism=false." >&2
+          exit 1
+        fi
+        use_ep=1
+      elif [ "false" = "auto" ] && [ "$is_moe" = "moe" ] && [ 1 -ge 2 ]; then
+        use_ep=1
+      fi
+
+      # Expert parallelism: attention runs data-parallel on every GPU and the
+      # experts are split across them, so tensor parallelism stays at 1.
+      # Otherwise every GPU of the replica holds a slice of every layer.
+      if [ "$use_ep" -eq 1 ]; then
+        parallel_args="--data-parallel-size 1 --enable-expert-parallel"
+        echo "vllm: $arch ($is_moe), ExpertParallelism=false -> expert parallelism, data-parallel size 1"
+      else
+        parallel_args="--tensor-parallel-size 1"
+        echo "vllm: $arch ($is_moe), ExpertParallelism=false -> tensor parallelism, size 1"
+      fi
+
+      exec vllm serve "/data/models/nvidia--nvidia-nemotron-3-nano-30b-a3b-nvfp4@6efb4a2a1c1fa277ce7b3df7a1416255011b1c99" \
+        --served-model-name "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-NVFP4" \
+        $parallel_args \
+        --max-model-len 16384 \
+        --gpu-memory-utilization 0.5 \
+        --host 0.0.0.0 \
+        --port 8000 --trust-remote-code --max-num-seqs 4 --max-num-batched-tokens 2048 --enable-prompt-tokens-details --enable-auto-tool-choice --tool-call-parser qwen3_coder --reasoning-parser-plugin /data/nano_v3_reasoning_parser.py --reasoning-parser nano_v3
+    resource:
+      cpu:
+        cores: 20
+      memory:
+        size: 120GiB
+      devices:
+        nvidia.com/gpu: 1
+      annotations:
+        nvidia.com/gpu.model: NVIDIA GB10
+      exclusive: true
+    network:
+      ports:
+      - name: openai-api
+        port: 8000
+        protocol: tcp
+      endpoints:
+      - name: openai
+        port-name: openai-api
+        protocol: http
+        type: subdomain
+        scope: user
+    readiness-probe:
+      http-get:
+        path: /health
+        port: 8000
+        scheme: HTTP
+      initial-delay-seconds: 60
+      period-seconds: 15
+      timeout-seconds: 5
+      failure-threshold: 120
+      success-threshold: 1
+    files:
+      /opt/collect-worker-provenance.py: file://collect-worker-provenance.py
+files:
+  collect-worker-provenance.py: |
+    """Collect non-secret startup provenance inside the requested serving image."""
+
+    import importlib.metadata
+    import json
+    import os
+    from pathlib import Path
+    import platform
+    import subprocess
+
+    import torch
+    import vllm
+
+
+    def command(args):
+        try:
+            result = subprocess.run(args, capture_output=True, text=True, timeout=20)
+            return result.stdout.strip() if result.returncode == 0 else None
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+
+
+    def collect():
+        expected_gpu = os.environ.get("PROFILING_EXPECTED_GPU_UUID")
+        visible_gpus = command(["nvidia-smi", "--query-gpu=uuid", "--format=csv,noheader"])
+        if expected_gpu and (not visible_gpus or expected_gpu not in visible_gpus.splitlines()):
+            raise RuntimeError("Requested SPARK03 GPU is not visible; refusing to start inference")
+        model_dir = Path(os.environ["PROFILING_MODEL_PATH"])
+        config = json.loads((model_dir / "config.json").read_text())
+        properties = torch.cuda.get_device_properties(0) if torch.cuda.is_available() else None
+        git_commit = command(["git", "-C", "/opt/vllm", "rev-parse", "HEAD"])
+        if not git_commit:
+            direct_url = importlib.metadata.distribution("vllm").read_text("direct_url.json")
+            if direct_url:
+                git_commit = json.loads(direct_url).get("vcs_info", {}).get("commit_id")
+        data = {
+            "model_checkpoint": os.environ["PROFILING_CHECKPOINT"],
+            "model_revision": os.environ["PROFILING_MODEL_REVISION"],
+            "model_path": str(model_dir),
+            "engine_version": vllm.__version__,
+            "engine_commit": git_commit,
+            "engine_package_path": str(Path(vllm.__file__).resolve()),
+            "torch_version": torch.__version__,
+            "cuda_runtime_version": torch.version.cuda,
+            "python_version": platform.python_version(),
+            "architecture": platform.machine(),
+            "hostname": platform.node(),
+            "gpu": {
+                "name": properties.name,
+                "total_memory_bytes": properties.total_memory,
+                "compute_capability": f"{properties.major}.{properties.minor}",
+                "multiprocessor_count": properties.multi_processor_count,
+            } if properties else None,
+            "gpu_query": command(["nvidia-smi", "--query-gpu=name,uuid,memory.total,driver_version,compute_cap", "--format=csv,noheader,nounits"]),
+            "nvidia_smi": command(["nvidia-smi"]),
+            "gpu_processes_before_model_start": command(["nvidia-smi", "--query-compute-apps=pid,process_name,used_gpu_memory", "--format=csv,noheader,nounits"]),
+            "nvcc": command(["nvcc", "--version"]),
+            "model_config": config,
+            "selected_environment": {key: os.environ.get(key) for key in ["VLLM_USE_FLASHINFER_MOE_FP4", "VLLM_FLASHINFER_MOE_BACKEND", "CUDA_VERSION", "NVIDIA_BUILD_ID"]},
+        }
+        output = Path("/data/profiling/runtime-provenance.json")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(data, indent=2) + "\n")
+        print("PROFILING_PROVENANCE " + json.dumps(data), flush=True)
+
+
+    if __name__ == "__main__":
+        collect()

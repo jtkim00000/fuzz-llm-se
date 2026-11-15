@@ -1,5 +1,8 @@
 .env
+.local-inference/
 .venv-aiperf/
+.venv-precisionsplit/
+__pycache__/
 results/
 __pycache__/
 *.py[cod]
