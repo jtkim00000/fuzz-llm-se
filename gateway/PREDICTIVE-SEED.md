@@ -125,6 +125,16 @@ No second attempt or worker restart was made. The original workers and gateway
 remain active. Upstream readiness/generation needs diagnosis before further
 policy evaluation; a successful health/model-list response was insufficient.
 
+A later inventory showed external worker replacement during this task:
+`00dfc1a3-4d2f-45c2-8585-ebe359a04571` (stock-kv-a, SPARK04) and
+`b1b2876e-4ecd-40d8-8574-9ea9fb9bf30c` (stock-kv-b, SPARK03) are now active.
+This implementation did not create or stop those workflows. Their effective
+precision is unverified here; do not reuse the canary's captured identities.
+The original gateway remains active. Artifacts are backed up for 30 days at
+`fb://group/predictive-router/seed-2026-11-15-v1/artifacts.zip`, SHA-256
+`d817cd1c36282248542f8da9b6dbd50d1f7d4f3b0fd9b34a957b1bfd3bc1de50`.
+The archive is a frozen snapshot taken before this final inventory note.
+
 Do not point production traffic at the canary or call it a mixed-precision router.
 Promotion requires: restore/verify an approved mixed pair without disrupting
 teammates; independently evaluate natural-output quality; collect real multi-turn
