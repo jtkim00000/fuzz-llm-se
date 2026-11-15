@@ -1,5 +1,10 @@
 # Predictive routing seed: shadow only
 
+Historical shadow-adapter report: `gateway/shadow.py` still behaves as described
+below. The active `precision_split.vllm_gateway` now uses this saved seed for
+forwarding decisions; see [the current serving guide](../precision_split/PREDICTIVE_ROUTING.md).
+That implementation does not establish a measured routing or precision benefit.
+
 This branch validates and trains the handoff's 288-record controlled campaign.
 It does not establish a production routing benefit. The HTTP adapter cannot
 activate predictive routing: `create_shadow_app` accepts only `mode: shadow`.

@@ -2,22 +2,34 @@
   "model": "nvidia/Qwen3.8-27B-NVFP4",
   "max_model_len": 8192,
   "worker_timeout": 180,
-  "estimate_source": "hand_set_uncalibrated_linear_heuristic_not_regression",
+  "estimate_source": "profiling.features.predict:e2e_ms",
   "workers": {
     "bf16": {
-      "url": "http://192.168.99.12:18027",
-      "timing": {
-        "base_seconds": 0.05,
-        "input_seconds_per_token": 0.001,
-        "output_seconds_per_token": 0.04
-      }
-    },
-    "fp8": {
       "url": "http://192.168.99.13:18027",
       "timing": {
         "base_seconds": 0.05,
         "input_seconds_per_token": 0.001,
         "output_seconds_per_token": 0.04
+      },
+      "manifest": {
+        "effective_kv_dtype": "bfloat16",
+        "thinking_mode": true,
+        "max_model_len": 8192,
+        "configuration_evidence": "Stock worker startup logs verified BF16 compute with auto KV on 2026-11-15; route labels are legacy aliases."
+      }
+    },
+    "fp8": {
+      "url": "http://192.168.99.12:18027",
+      "timing": {
+        "base_seconds": 0.05,
+        "input_seconds_per_token": 0.001,
+        "output_seconds_per_token": 0.04
+      },
+      "manifest": {
+        "effective_kv_dtype": "bfloat16",
+        "thinking_mode": true,
+        "max_model_len": 8192,
+        "configuration_evidence": "Stock worker startup logs verified BF16 compute with auto KV on 2026-11-15; route labels are legacy aliases."
       }
     }
   }

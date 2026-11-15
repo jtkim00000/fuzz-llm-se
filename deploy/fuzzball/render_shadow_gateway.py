@@ -8,7 +8,7 @@ from pathlib import Path
 def render(repo, model_dir):
     sources={}
     for package,names in {'gateway':['__init__.py','app.py','policy.py','shadow.py'],
-                          'profiling':['features.py','telemetry.py']}.items():
+                          'profiling':['features.py','schema.py','telemetry.py']}.items():
         for name in names:
             sources[f'{package}/{name}']=(repo/package/name).read_text()
     sources['profiling/__init__.py']=''

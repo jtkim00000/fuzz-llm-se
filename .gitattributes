@@ -1,0 +1,2 @@
+# Keep the frozen trained artifact's original bytes and provenance hash.
+gateway/models/vast-full-v1/model.json -text

@@ -16,6 +16,7 @@ from starlette.background import BackgroundTask
 from .forwarding import VLLMForwarder
 from .routing import GreedyRouter, WorkerUnavailable
 from .timing import ServiceTime
+from .prediction import CompletionPredictor, request_features
 
 
 logger = logging.getLogger("precision_split.vllm")
@@ -34,7 +35,15 @@ class ChatRequest(BaseModel):
 def create_vllm_gateway(config, *, transport=None):
     workers = config["workers"]
     model = config["model"]
-    router = GreedyRouter({name: ServiceTime(**info["timing"]) for name, info in workers.items()})
+    router = GreedyRouter({name: ServiceTime(**info["timing"]) for name, info in workers.items()},
+                         routing_policy="minimum_predicted_completion_time")
+    predictor = None
+    model_error = None
+    try:
+        predictor = CompletionPredictor(workers, config.get("prediction_model_path"))
+    except (OSError, ValueError, KeyError, TypeError, IndexError) as error:
+        model_error = type(error).__name__
+        logger.error("Prediction model unavailable: %s", model_error)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -46,6 +55,7 @@ def create_vllm_gateway(config, *, transport=None):
 
     app = FastAPI(title="PrecisionSplit vLLM gateway", lifespan=lifespan)
     app.state.router = router
+    app.state.predictor = predictor
 
     async def availability():
         names = list(workers)
@@ -62,7 +72,9 @@ def create_vllm_gateway(config, *, transport=None):
     async def state():
         return {**await router.snapshot(), "healthy": await availability(), "model": model,
                 "worker_urls": {name: info["url"] for name, info in workers.items()},
-                "estimate_source": config.get("estimate_source", "uncalibrated_initial_heuristic")}
+                "estimate_source": "profiling.features.predict:e2e_ms",
+                "prediction_model_version": predictor.version if predictor else None,
+                "prediction_model_error": model_error}
 
     @app.get("/v1/models")
     async def models():
@@ -97,7 +109,22 @@ def create_vllm_gateway(config, *, transport=None):
             tokens = await app.state.forwarder.token_count(eligible[0], model, payload)
             if tokens + budget > config.get("max_model_len", 32768):
                 return JSONResponse({"error": {"message": "Input plus output budget exceeds context limit"}}, status_code=400)
-            assignment = await router.reserve(session, tokens, budget, eligible_workers=eligible)
+            eligible = [name for name in eligible if tokens + budget <=
+                        workers[name].get("manifest", {}).get("max_model_len", config.get("max_model_len", 32768))]
+            if not eligible:
+                return JSONResponse({"error": {"message": "No worker can serve this context length"}}, status_code=400)
+            snapshots = {}
+            if await router.session_worker(session) is None:
+                values = await asyncio.gather(*(app.state.forwarder.snapshot(name, workers[name]) for name in eligible))
+                snapshots = dict(zip(eligible, values))
+
+            def score_candidates(counts):
+                if predictor is None:
+                    raise ValueError("Prediction model unavailable")
+                return predictor.score(request_features(payload, tokens, budget), snapshots, counts)
+
+            assignment = await router.reserve(session, tokens, budget, eligible_workers=eligible,
+                                              score_candidates=score_candidates)
         except WorkerUnavailable as error:
             return JSONResponse({"error": {"message": str(error)}}, status_code=503)
         except (httpx.HTTPError, KeyError, ValueError):

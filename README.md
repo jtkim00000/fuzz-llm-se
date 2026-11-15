@@ -17,6 +17,10 @@ The [real Fuzzball deployment guide](deploy/fuzzball/PRECISIONSPLIT.md) document
 the CPU gateway connected to the two GB10 Qwen3.8-27B workers, authentication and
 verified streaming/session-routing tests.
 
+The real gateway request handler now uses the saved latency forest for new
+sessions. See [predictive routing and HTTP verification](precision_split/PREDICTIVE_ROUTING.md)
+for model provenance, score units, atomic load tracking and deployment status.
+
 ## Open WebUI
 
 Open WebUI is included as a Docker Compose service. Start it with:

@@ -1,8 +1,9 @@
 # PrecisionSplit: least-outstanding-request routing
 
-On the `greedy-gateway` branch, new sessions go to the healthy worker with
-fewer outstanding requests. This applies to both the local mock gateway and
-`vllm-gateway`, through the shared `GreedyRouter` implementation.
+The local mock gateway sends new sessions to the worker with fewer outstanding
+requests. The real `vllm-gateway` handler now selects minimum predicted E2E
+latency using the saved model; see [predictive routing](PREDICTIVE_ROUTING.md).
+Both use the shared atomic reservation and affinity tracker.
 
 Outstanding means every request assigned through this gateway that has not
 finished: running, waiting upstream, and streaming. It does not mean lifetime

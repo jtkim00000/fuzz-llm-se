@@ -23,6 +23,8 @@ class VLLMGatewayTests(unittest.TestCase):
             captured.append(request)
             if request.url.path == "/health":
                 return httpx.Response(200)
+            if request.url.path == "/metrics":
+                return httpx.Response(200, text="")
             if request.url.path == "/tokenize":
                 self.assertEqual(json.loads(request.content)["messages"], [{"role": "user", "content": "hello"}])
                 return httpx.Response(200, json={"count": 7})
@@ -50,6 +52,8 @@ class VLLMGatewayTests(unittest.TestCase):
         def backend(request):
             if request.url.path == "/health":
                 return httpx.Response(503 if request.url.host == "existing" else 200)
+            if request.url.path == "/metrics":
+                return httpx.Response(200, text="")
             if request.url.path == "/tokenize":
                 return httpx.Response(200, json={"count": 120})
             return httpx.Response(200, json={"choices": []})
@@ -65,6 +69,8 @@ class VLLMGatewayTests(unittest.TestCase):
         def backend(request):
             if request.url.path == "/health":
                 return httpx.Response(200)
+            if request.url.path == "/metrics":
+                return httpx.Response(200, text="")
             if request.url.path == "/tokenize":
                 return httpx.Response(200, json={"count": 3})
             return httpx.Response(500, json={"error": "engine failed"})
@@ -96,6 +102,8 @@ class StreamingTests(unittest.IsolatedAsyncioTestCase):
         def backend(request):
             if request.url.path == "/health":
                 return httpx.Response(200)
+            if request.url.path == "/metrics":
+                return httpx.Response(200, text="")
             if request.url.path == "/tokenize":
                 return httpx.Response(200, json={"count": 3})
             return httpx.Response(200, headers={"content-type": "text/event-stream"}, stream=Stream())
@@ -125,6 +133,8 @@ class StreamingTests(unittest.IsolatedAsyncioTestCase):
         def backend(request):
             if request.url.path == "/health":
                 return httpx.Response(200)
+            if request.url.path == "/metrics":
+                return httpx.Response(200, text="")
             if request.url.path == "/tokenize":
                 return httpx.Response(200, json={"count": 3})
             return httpx.Response(200, headers={"content-type": "text/event-stream"}, stream=Stream())

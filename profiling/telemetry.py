@@ -2,11 +2,10 @@
 import copy,math,threading,time,urllib.request,json,os
 from prometheus_client.parser import text_string_to_metric_families
 
-STATE_FIELDS=['active_requests','running_requests','queued_requests','running_sequences','running_tokens',
-'kv_cache_usage','kv_cache_free_blocks','prefix_cache_hit_rate','recent_request_rate',
-'recent_token_rate','uptime_seconds','recent_failures','time_since_last_request_seconds',
-'gpu_utilization','memory_bandwidth_utilization','gpu_memory_bytes','system_memory_bytes',
-'cpu_utilization','network_rtt_ms']
+try:
+    from .schema import STATE_FIELDS
+except ImportError:
+    from schema import STATE_FIELDS
 
 def headers(worker):
     key=os.environ.get(worker.get('api_key_env','BENCHMARK_API_KEY'))

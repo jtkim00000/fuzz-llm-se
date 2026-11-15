@@ -1,0 +1,154 @@
+{
+  "created_at": "2026-11-15T16:17:34.910661+00:00",
+  "git_commit": "477928926b9601ba6d9c7a1103c6fd218f6410dd",
+  "data_sha256": "96d74300b270737f3a8d8ed2d2e935589f2e2048b4c41157d93665148c696fa0",
+  "model_sha256": "2a9372b996c76518158cd091e1fba9366d265bcf3d8791e0039108eee05c89d5",
+  "source_validation_sha256": "12e9924ca5873f5bea59b2593922b18d5690892e92eca72c4ae1693c34cb3f4b",
+  "source_runs": {
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\bf16\\c1-r1": {
+      "requests_sha256": "c9d740e926e79b626bae3b91744aa397f1ae9231ebfe11be3355c5860a4cd125",
+      "trace_sha256": "a5f2dde8b03aab2028c1f95b7d588a50c602db0fcb92291b7530e3dd4214a505"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\bf16\\c1-r2": {
+      "requests_sha256": "572fc422739a56828ed6bbdea65f49d16bf3da4b09dfc36fa64738f7531ef65f",
+      "trace_sha256": "60b1011cad383b4730a83b4fc4643946372d8d63dccc08b3bc99ef10036a64ce"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\bf16\\c1-r3": {
+      "requests_sha256": "2a02b401366fa1c4ccdaff11af28667c812df6564d67de7e3a903687bd06b78f",
+      "trace_sha256": "2250dcf1ca5c0337b4a3694da2082315d9270325c46bd608a431b6cec2e5fac4"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\bf16\\c4-r1": {
+      "requests_sha256": "4bc12c39770e7411a0448ee65ab10ae9166e5a4645e63ab05e55ed3385d4ae0f",
+      "trace_sha256": "9ec641fef5f643883db8148f4f4bd46080b9c440fbe2c6c041c5f7abb84ce632"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\bf16\\c4-r2": {
+      "requests_sha256": "2507ee18023960e633e5331af10299cccd7c6ce32df206299307d6ff49bde56e",
+      "trace_sha256": "dada5c06d59dada4380b3ca3d49b67f2e5974e79bfd12c190ad4c1165929eac8"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\bf16\\c4-r3": {
+      "requests_sha256": "d021ef38923f7b81a1ccbed34b52de8b23ec002106078d212a33fa5ed31f95bc",
+      "trace_sha256": "100d2ebdb6c2a77a6176e3234f7d48a584638a43c48cdb6428ac2fb297bf3e15"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\fp8\\c1-r1": {
+      "requests_sha256": "102e6f98c682ca3153cfb9015a5816dd06a678a9860112adb330660f58ea600f",
+      "trace_sha256": "a5f2dde8b03aab2028c1f95b7d588a50c602db0fcb92291b7530e3dd4214a505"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\fp8\\c1-r2": {
+      "requests_sha256": "c42c129afdc3ce4e4d191aaabcfce2563ce6f7ef1b786cc483740beba7d8f619",
+      "trace_sha256": "60b1011cad383b4730a83b4fc4643946372d8d63dccc08b3bc99ef10036a64ce"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\fp8\\c1-r3": {
+      "requests_sha256": "7255fe1e28a034b951702f3361244bb4aaed1370247fd2436adfc8bd1ba69f24",
+      "trace_sha256": "2250dcf1ca5c0337b4a3694da2082315d9270325c46bd608a431b6cec2e5fac4"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\fp8\\c4-r1": {
+      "requests_sha256": "ff962b1d6cb46a99b78417803d4ddcc3f1f41d7ab81cbefb2410d012d62a9314",
+      "trace_sha256": "9ec641fef5f643883db8148f4f4bd46080b9c440fbe2c6c041c5f7abb84ce632"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\fp8\\c4-r2": {
+      "requests_sha256": "d95585197fbdd4f663e2ae724fb4429082a099243826e2762497c918331dbdb2",
+      "trace_sha256": "dada5c06d59dada4380b3ca3d49b67f2e5974e79bfd12c190ad4c1165929eac8"
+    },
+    "profiling\\results\\vast-full-bf16-fp8-2026-11-15\\fp8\\c4-r3": {
+      "requests_sha256": "df06ec3077e295907fd1890f03695908528ed7ad3ee1b38c3781c0ce202fcda8",
+      "trace_sha256": "100d2ebdb6c2a77a6176e3234f7d48a584638a43c48cdb6428ac2fb297bf3e15"
+    }
+  },
+  "split_rule": "stable hash of enclosing prompt/session group; same prompt across concurrency and precision stays together",
+  "feature_schema_version": 1,
+  "sklearn_version": "1.7.2",
+  "command": "python profiling/train_regression.py --data results/router-seed-2026-11-15-v1/dataset/training.jsonl --out results/router-seed-2026-11-15-v1/model",
+  "approver": null,
+  "promotion_status": "seed_only_shadow_not_quality_approved",
+  "evaluation": {
+    "split_method": "complete session groups with stable hash assignments",
+    "warnings": [
+      "success: no outcome variation; do not claim a useful reliability classifier"
+    ],
+    "splits": {
+      "train": {
+        "rows": 200,
+        "groups": 50
+      },
+      "validation": {
+        "rows": 52,
+        "groups": 13
+      },
+      "test": {
+        "rows": 36,
+        "groups": 9
+      }
+    },
+    "targets": {
+      "ttft_ms": {
+        "status": "trained",
+        "feature_importance_note": "Compare to held-out baselines; do not tune on test data.",
+        "validation": {
+          "n": 52,
+          "mae_ms": 295.6400402479389,
+          "constant_baseline_error": 1672.739924369266,
+          "by_precision_error": {
+            "other_or_unknown": 324.91891245677704,
+            "fp8": 266.3611680391007
+          }
+        },
+        "test": {
+          "n": 36,
+          "mae_ms": 602.5926865459681,
+          "constant_baseline_error": 1366.2227731744192,
+          "by_precision_error": {
+            "other_or_unknown": 627.1931834720168,
+            "fp8": 577.9921896199196
+          }
+        }
+      },
+      "e2e_ms": {
+        "status": "trained",
+        "feature_importance_note": "Compare to held-out baselines; do not tune on test data.",
+        "validation": {
+          "n": 52,
+          "mae_ms": 1751.6600112895492,
+          "constant_baseline_error": 15404.660428888465,
+          "by_precision_error": {
+            "other_or_unknown": 1726.220195846691,
+            "fp8": 1777.0998267324076
+          }
+        },
+        "test": {
+          "n": 36,
+          "mae_ms": 1635.5685859350986,
+          "constant_baseline_error": 17708.622329561065,
+          "by_precision_error": {
+            "other_or_unknown": 1387.285614331658,
+            "fp8": 1883.851557538539
+          }
+        }
+      },
+      "slo_met": {
+        "status": "unavailable_insufficient_labels"
+      },
+      "success": {
+        "status": "constant_single_class_no_reliability_validation",
+        "feature_importance_note": "Compare to held-out baselines; do not tune on test data.",
+        "validation": {
+          "n": 52,
+          "brier_score": 0.0,
+          "constant_baseline_error": 0.0,
+          "by_precision_error": {
+            "other_or_unknown": 0.0,
+            "fp8": 0.0
+          }
+        },
+        "test": {
+          "n": 36,
+          "brier_score": 0.0,
+          "constant_baseline_error": 0.0,
+          "by_precision_error": {
+            "other_or_unknown": 0.0,
+            "fp8": 0.0
+          }
+        }
+      }
+    }
+  }
+}
