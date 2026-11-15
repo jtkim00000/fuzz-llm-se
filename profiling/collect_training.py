@@ -26,7 +26,7 @@ def completion(worker,messages,turn,timeout):
     body={'model':worker['model'],'messages':messages,'stream':turn.get('streaming',True),
           worker.get('output_limit_field','max_tokens'):turn['output_limit'],'temperature':0}
     # Modes are explicit in the trace and preserved as pre-dispatch features.
-    for k in ['response_format','tools','tool_choice','chat_template_kwargs']:
+    for k in ['response_format','tools','tool_choice','chat_template_kwargs','min_tokens','ignore_eos','stop']:
         if k in turn:body[k]=turn[k]
     if body['stream']:body['stream_options']={'include_usage':True}
     chunks=[];content='';reasoning='';usage={};finish=None;events=[]
