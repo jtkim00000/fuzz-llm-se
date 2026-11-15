@@ -62,3 +62,11 @@ capacity/bandwidth but does not measure multi-turn prefix-cache reuse.  The
 strict JSON retrieval grade is diagnostic only; do not claim quality parity
 from this performance run without a separately designed and predeclared
 quality evaluation.
+
+## Predictive-router seed preparation
+
+`../../build_predictive_router_dataset.py` turns both `measurement/` folders
+into 200 per-worker rows plus 100 matched-prompt diagnostic pairs. It keeps
+only pre-dispatch values in `features`; outcomes remain labels. The routing
+boundary, training sequence, promotion gates, and gateway contract are in
+`../../PREDICTIVE-GATEWAY-PLAN.md`.
