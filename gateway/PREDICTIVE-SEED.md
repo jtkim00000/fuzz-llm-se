@@ -114,6 +114,17 @@ learned proposals for the live workers as `unknown_configuration`; quality is
 also explicitly unapproved. Its baseline smoke is recorded separately from
 prediction checks. No existing workflow was stopped or replaced.
 
+The canary's model-list and telemetry calls succeeded, and its shadow policy
+rejected both unknown configurations. Its first 8-token completion request to
+node-a returned HTTP 504 after the gateway's 120-second read timeout. It did not
+retry on node-b. Live two-session affinity and streaming therefore did **not**
+pass. Fuzzball automatically terminated the canary after the smoke job failed;
+it is errored, not a usable running endpoint. Failure logs are retained at
+`fb://group/predictive-router/seed-2026-11-15-v1/canary-failure.log` (30-day TTL).
+No second attempt or worker restart was made. The original workers and gateway
+remain active. Upstream readiness/generation needs diagnosis before further
+policy evaluation; a successful health/model-list response was insufficient.
+
 Do not point production traffic at the canary or call it a mixed-precision router.
 Promotion requires: restore/verify an approved mixed pair without disrupting
 teammates; independently evaluate natural-output quality; collect real multi-turn
