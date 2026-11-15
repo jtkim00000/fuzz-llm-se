@@ -11,7 +11,7 @@ import matplotlib
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
-RESULT = 'profiling/results/bf16-fp8-vast-reactome-c4-100-2026-11-14'
+RESULT = 'profiling/results/vast-full-bf16-fp8-2026-11-15'
 DEFAULT_REF = 'origin/profiling/bf16-fp8-request-records'
 INPUTS = {'input_tokens': 'Input tokens (pre-dispatch)'}
 OUTPUTS = {
@@ -42,18 +42,36 @@ def load_data(args):
     commit = None
     for precision in COLORS:
         explicit = getattr(args, precision)
-        local = args.results_dir / precision / 'measurement/canonical-requests.jsonl'
-        if explicit or local.is_file():
-            path = explicit or local
-            text = path.read_text()
-            sources[precision] = str(path.resolve())
-        else:
-            if commit is None:
-                commit = subprocess.check_output(['git', 'rev-parse', args.ref], cwd=REPO, text=True).strip()
-            relative = f'{RESULT}/{precision}/measurement/canonical-requests.jsonl'
-            text = subprocess.check_output(['git', 'show', f'{commit}:{relative}'], cwd=REPO, text=True)
-            sources[precision] = f'{commit}:{relative}'
-        rows = [json.loads(line) for line in text.splitlines() if line.strip()]
+        rows = []
+        sources[precision] = []
+        paths = [(None, explicit)] if explicit else [(c, args.results_dir / precision / c / 'canonical-requests.jsonl') for c in [f'c{c}-r{r}' for c in (1, 4) for r in (1, 2, 3)]]
+        for block, path in paths:
+            if path.is_file():
+                text = path.read_text()
+                sources[precision].append(str(path.resolve()))
+            elif explicit or args.results_dir.resolve() != (REPO / RESULT).resolve():
+                raise FileNotFoundError(path)
+            else:
+                if commit is None:
+                    commit = subprocess.check_output(['git', 'rev-parse', args.ref], cwd=REPO, text=True).strip()
+                relative = f'{RESULT}/{precision}/{block}/canonical-requests.jsonl'
+                text = subprocess.check_output(['git', 'show', f'{commit}:{relative}'], cwd=REPO, text=True)
+                sources[precision].append(f'{commit}:{relative}')
+            for line in text.splitlines():
+                if not line.strip():
+                    continue
+                row = json.loads(line)
+                if block:
+                    row['_concurrency'] = int(block.split('-')[0][1:])
+                elif 'concurrency' in row:
+                    row['_concurrency'] = int(row['concurrency'])
+                else:
+                    import re
+                    match = re.search(r'(?:^|[-_])c(1|4)(?:[-_:]|$)', row.get('run_id', ''))
+                    if not match:
+                        raise ValueError('Explicit input needs concurrency or a run_id containing c1/c4')
+                    row['_concurrency'] = int(match.group(1))
+                rows.append(row)
         ids = [(r.get('run_id'), r['request_id']) for r in rows]
         if len(ids) != len(set(ids)):
             raise ValueError(f'Duplicate run/request IDs in {precision}')
@@ -65,6 +83,16 @@ def load_data(args):
                 origins[run] = min(origins.get(run, ts), ts)
         data[precision] = (rows, origins)
     return data, sources
+
+
+def select_data(data, concurrency, output_limit):
+    subset = PlotData()
+    subset.selection = {'concurrency': concurrency, 'output_limit': output_limit}
+    for precision, (rows, origins) in data.items():
+        subset[precision] = ([r for r in rows
+            if (concurrency == 'all' or r['_concurrency'] == int(concurrency))
+            and (output_limit == 'all' or r['requested_output_token_limit'] == int(output_limit))], origins)
+    return subset
 
 
 def values(data, precision, x, y):
@@ -185,7 +213,9 @@ def draw(ax, data, x, y, layers, colors, trim_percent=0):
     ax.autoscale_view()
     ax.set_xlabel(INPUTS[x], labelpad=10)
     ax.set_ylabel(OUTPUTS[y], labelpad=10)
-    ax.set_title(f'{OUTPUTS[y].split(" (")[0]} vs {INPUTS[x].split(" (")[0]}', pad=16)
+    condition = getattr(data, 'selection', {})
+    subtitle = f"Concurrency: {condition.get('concurrency', 'all')} | Output limit: {condition.get('output_limit', 'all')}"
+    ax.set_title(f'{OUTPUTS[y].split(" (")[0]} vs input tokens\n{subtitle}', pad=12)
     ax.grid(True, alpha=0.2)
     ax.set_axisbelow(True)
     if ax.get_legend() is not None:
@@ -212,7 +242,7 @@ def export_pdf(data, sources, x, y, layers, colors, path, limits=None, trim_perc
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, format='pdf', metadata={'Title': ax.get_title(), 'Creator': 'request_scatter.py'})
     path.with_suffix('.json').write_text(json.dumps({
-        'x': x, 'y': y, 'visible_layers': layers, 'colors': colors, 'sources': sources,
+        'x': x, 'y': y, 'selection': getattr(data, 'selection', {}), 'visible_layers': layers, 'colors': colors, 'sources': sources,
         'timestamp_mode': 'seconds_since_first_dispatch_per_run',
         'regression_function': 'linear', 'statistics': statistics,
         'scatter_excludes_trimmed_points': True,
@@ -236,6 +266,8 @@ def main():
     parser.add_argument('--regression', action='store_true', help='Show separate descriptive linear fits')
     parser.add_argument('--layers', nargs='+', choices=LAYERS, help='Explicit independent layers; overrides --precisions/--regression')
     parser.add_argument('--trim-percent', type=float, default=0, help='Exclude this percent of largest baseline residuals from each fit only')
+    parser.add_argument('--concurrency', choices=['1', '4', 'all'], default='1')
+    parser.add_argument('--output-limit', choices=['32', '256', 'all'], default='256')
     args = parser.parse_args()
     if not np.isfinite(args.trim_percent) or not 0 <= args.trim_percent < 100:
         parser.error('--trim-percent must be finite and in [0, 100).')
@@ -247,20 +279,24 @@ def main():
     colors = {'bf16': args.bf16_color, 'fp8': args.fp8_color}
     if not all(is_color_like(c) for c in colors.values()):
         parser.error('Colors must be Matplotlib color names or hex strings.')
-    data, sources = load_data(args)
+    all_data, sources = load_data(args)
+    data = select_data(all_data, args.concurrency, args.output_limit)
     layers = list(dict.fromkeys(args.layers)) if args.layers else [
         layer for p in dict.fromkeys(args.precisions)
         for layer in ([p + '_scatter', p + '_regression'] if args.regression else [p + '_scatter'])]
     if args.export_all:
         for x in INPUTS:
             for y in OUTPUTS:
-                export_pdf(data, sources, x, y, layers, colors, args.output_dir / f'{y}__vs__{x}.pdf', trim_percent=args.trim_percent)
+                export_pdf(data, sources, x, y, layers, colors, args.output_dir / f'{y}__vs__{x}__c{args.concurrency}__o{args.output_limit}.pdf', trim_percent=args.trim_percent)
         print(f'Exported 5 PDFs and their source metadata to {args.output_dir.resolve()}')
         return
     state = {'x': 'input_tokens', 'y': args.y, 'trim_percent': args.trim_percent}
     fig = plt.figure(figsize=(15, 10))
     fig.canvas.manager.set_window_title('Serving request scatter explorer')
-    ax = fig.add_axes([.085, .30, .57, .61])
+    concurrency_box = TextBox(fig.add_axes([.22, .95, .10, .035]), 'Concurrency ', initial=args.concurrency)
+    output_box = TextBox(fig.add_axes([.49, .95, .10, .035]), 'Output limit ', initial=args.output_limit)
+    fig.text(.085, .925, 'Filters: concurrency 1 / 4 / all; output limit 32 / 256 / all. Press Enter.', fontsize=8)
+    ax = fig.add_axes([.085, .30, .57, .55])
     fig.text(.70, .955, 'Plot controls', fontsize=15, weight='bold')
     fig.text(.70, .915, 'Visible layers', fontsize=10, weight='bold')
     checks = CheckButtons(fig.add_axes([.70, .78, .28, .125]), LAYER_LABELS, [layer in layers for layer in LAYERS])
@@ -317,6 +353,18 @@ def main():
             ax.set_ylim(limits[1])
         sync_fields()
         fig.canvas.draw_idle()
+    def apply_filters(_):
+        nonlocal data
+        c, o = concurrency_box.text.strip(), output_box.text.strip()
+        if c not in ('1', '4', 'all') or o not in ('32', '256', 'all'):
+            status.set_text('Use concurrency 1/4/all and output limit 32/256/all.')
+            fig.canvas.draw_idle()
+            return
+        data = select_data(all_data, c, o)
+        status.set_text('Filters applied. Mixed conditions can obscure trends.' if 'all' in (c,o) else 'Matched condition selected; 36 requests per precision across three repetitions.')
+        redraw(reset=True)
+    concurrency_box.on_submit(apply_filters)
+    output_box.on_submit(apply_filters)
     def choose_y(label):
         state['y'] = list(OUTPUTS)[['End-to-end latency','TTFT','Actual output tokens','Dispatch time (relative)','Completion time (relative)'].index(label)]
         redraw(reset=True)
@@ -335,7 +383,7 @@ def main():
         if not layers:
             status.set_text('Select at least one layer before exporting.')
         else:
-            name = f'{state["y"]}__vs__{state["x"]}__{"-".join(layers)}.pdf'
+            name = f'{state["y"]}__vs__{state["x"]}__c{data.selection["concurrency"]}__o{data.selection["output_limit"]}__{"-".join(layers)}.pdf'
             path = args.output_dir / name
             try:
                 export_pdf(data, sources, state['x'], state['y'], layers, colors, path,

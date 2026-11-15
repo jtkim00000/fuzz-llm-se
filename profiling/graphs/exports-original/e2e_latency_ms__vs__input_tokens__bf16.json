@@ -1,0 +1,44 @@
+{
+  "x": "input_tokens",
+  "y": "e2e_latency_ms",
+  "precisions": [
+    "bf16"
+  ],
+  "colors": {
+    "bf16": "#2166AC",
+    "fp8": "#D6604D"
+  },
+  "sources": {
+    "bf16": "1d102e0d4ed6090dcea0461408761b2fc5fd4da3:profiling/results/deprecated-direct-node-bf16-fp8-vast-reactome-c4-100-2026-11-14/bf16/measurement/canonical-requests.jsonl",
+    "fp8": "1d102e0d4ed6090dcea0461408761b2fc5fd4da3:profiling/results/deprecated-direct-node-bf16-fp8-vast-reactome-c4-100-2026-11-14/fp8/measurement/canonical-requests.jsonl"
+  },
+  "timestamp_mode": "seconds_since_first_dispatch_per_run",
+  "show_legend": false,
+  "regression": {
+    "bf16": true,
+    "fp8": true
+  },
+  "axis_limits": [
+    [
+      5849.804126984127,
+      6224.88
+    ],
+    [
+      -0.004561243586266528,
+      45.94740314645645
+    ]
+  ],
+  "fits": {
+    "bf16": {
+      "slope": -0.00021435700353004513,
+      "intercept": 15.779607423886198,
+      "r_squared": 2.4162037798314273e-06
+    }
+  },
+  "counts": {
+    "bf16": {
+      "plotted": 100,
+      "attempts": 100
+    }
+  }
+}

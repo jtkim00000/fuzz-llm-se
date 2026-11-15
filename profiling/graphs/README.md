@@ -35,7 +35,8 @@ sharing a trimmed analysis. Slow requests may reflect real serving behavior.
 
 ## Data sources and command-line options
 
-Default data: matched 100-request BF16/FP8 result folder under `profiling/results`.
+Default data: `profiling/results/vast-full-bf16-fp8-2026-11-15`, with
+144 requests per precision (72 in c1 and 72 in c4).
 If absent from the checkout, the script reads the committed records directly from
 `origin/profiling/bf16-fp8-request-records` without checkout or network access.
 The resolved commit is saved for Git-sourced exports. Local files take precedence.
@@ -48,8 +49,9 @@ The resolved commit is saved for Git-sourced exports. Local files take precedenc
   --trim-percent 5 --output-dir /path/to/plots
 ```
 
-`--results-dir` accepts a parent containing `bf16/measurement/canonical-requests.jsonl`
-and the corresponding FP8 path. `--y` selects a canonical output field. `--regression`
+`--results-dir` accepts a parent containing `bf16/c1-r1/canonical-requests.jsonl` through `bf16/c1-r3/canonical-requests.jsonl`,
+and `bf16/c4-r1/canonical-requests.jsonl` through `bf16/c4-r3/canonical-requests.jsonl` and the corresponding FP8 paths. Explicit JSONL
+inputs need a concurrency field or a run_id containing c1/c4. `--y` selects a canonical output field. `--regression`
 enables linear lines alongside scatter; explicit `--layers` overrides it.
 `--bf16-color` and `--fp8-color` accept color names/hex. There is no X-variable
 selector or `--x` option now.
@@ -78,3 +80,57 @@ Dependencies: Python 3.10+, NumPy, Matplotlib (see requirements.txt). The existi
 `.venv-aiperf` environment supports this script. Interactive operation requires a
 desktop Matplotlib backend; batch export uses Agg. Original profiling results are
 never modified by the viewer.
+
+## Full campaign filters
+
+The default view is **concurrency 1, output limit 256**, with 36 points per
+precision. Above the graph, type concurrency `1`, `4`, or `all`, and output limit
+`32`, `256`, or `all`, then press Enter. Every combination is available, including
+all 144 points per precision. Compare matching conditions first; pooling output
+lengths/concurrencies can obscure input-length relationships. The plot title and
+PDF sidecar record the active selection; filenames include it.
+
+Command-line equivalents: `--concurrency 1 --output-limit 256`. Batch export generates
+five output plots for that selection, not every condition. Filters reset axis
+ranges; all earlier color, layer, trimming and PDF controls remain available.
+
+The full campaign has 36 points per precision for each concurrency/output condition,
+covering four length targets, three examples and three repetitions (nine observations
+per length cell). Repetitions are pooled by these filters, and timestamp origins remain
+separate for each run. Prefix caching remains enabled and unverified; this is not a
+cold-cache or quality benchmark. Trimming defaults to zero.
+
+The update was checked against branch commit `1d102e0`: 288 successful records,
+matched prompt traces and per-ID token counts, exact 32/256 outputs, complete ledger
+and raw-record joins, and pre-dispatch telemetry linkage. Maximum sample age was
+approximately 244 ms. At c1/output 256, untrimmed linear TTFT R² was 0.9969 (BF16)
+and 0.9993 (FP8); E2E R² was 0.9711 and 0.9859. These are in-sample descriptions,
+not held-out prediction scores. Loaded c4 relationships are substantially weaker.
+
+## Original dataset viewer (separate script)
+
+```sh
+.venv-aiperf/bin/python profiling/graphs/request_scatter_original.py
+```
+
+Restores the first working viewer from commit `15e6548`, with four selectable
+input axes, five output axes, BF16/FP8 visibility and color controls, and graph-only
+PDF export. It loads the historical 100-request-per-precision dataset now stored
+under `deprecated-direct-node-bf16-fp8-vast-reactome-c4-100-2026-11-14`, using the
+same Git fallback as before. Exports go into `exports-original`, separate from the
+new campaign. `--export-all` generates all 20 input/output combinations.
+
+The original viewer includes independent BF16/FP8 regression toggles and fits spanning the visible graph,
+and slope/intercept/R² below the graph. X/Y range sliders change the visible limits
+without recalculating fits; Auto axes restores the default bounds. PDF exports
+preserve those bounds and the regression setting, excluding controls and fit statistics.
+There are no axis text fields or outlier trimming. The current `request_scatter.py`
+remains unchanged. The old dataset
+has more variable natural output lengths, but a NARROWER input-token range
+(5,889–6,200), a fixed 128-token cap, and concurrency 4. The new campaign controls
+output length and varies inputs more broadly. Comparing these shows workload
+characteristics, not a controlled old-versus-new speedup. The branch marks the old
+data deprecated for active training; this viewer uses it only for historical analysis.
+
+The original viewer’s **Legend** checkbox shows or hides the color guide without
+changing the axes or fitted lines. PDF exports preserve this setting.
