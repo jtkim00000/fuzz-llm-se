@@ -1,0 +1,18 @@
+{
+  "trace_sha256": "8c741383b11c6a3909cacf9938ce67a2a3537189ed2b367e641537ec61f870fa",
+  "collector_sha256": "1aee1bf5a29bec4693d7ef0f08378569d9f25f9248c9506cb27b426da2052d1e",
+  "features_sha256": "093d231bf3efd32d7f64c0dec3c9efa0d7708a0341719f16a7b698e101f4fd66",
+  "code_hashes": {
+    "features.py": "093d231bf3efd32d7f64c0dec3c9efa0d7708a0341719f16a7b698e101f4fd66",
+    "telemetry.py": "342ac582e3223c33cb641467f89b33d5bf04e76e65c111887503bfd8ab63ca5b",
+    "collect_training.py": "1aee1bf5a29bec4693d7ef0f08378569d9f25f9248c9506cb27b426da2052d1e",
+    "build_vast_compact_campaign.py": "baa122e48b728c05cf9869b69fab13424aba816bb33da88bf5569ca3d70983c8",
+    "normalize_canonical_records.py": "89c4239d5cfa65013af928579650ae42f8380258a3c975f8ffbc9b95b68c2bbd",
+    "grade.py": "7c078e0ddeb8fb35dfc68f1b2b08d6ad5066e51f8a814ce45d72ca0b88b26a7c"
+  },
+  "tokenizer": "/models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80",
+  "cache_condition": "prefix-reuse-minimized, not verified cold",
+  "client_hostname": "run",
+  "started_ns": 1794755940550526823,
+  "timing_notes": "SSE chunks are not guaranteed single tokens; ITL percentiles remain null."
+}

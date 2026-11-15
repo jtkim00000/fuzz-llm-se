@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "sources": {
+    "profiling/results/bf16-fp8-vast-reactome-c4-100-2026-11-14/bf16/measurement": {
+      "requests_sha256": "e6354a94fc09c1d364c5da3af8acadd00b7068d6261d997dcf09baa406f6dfc9",
+      "trace_sha256": "f387617658581cb51597901134bdf082e0c075f9f1e1ef0cb374d964bffd43fb"
+    },
+    "profiling/results/bf16-fp8-vast-reactome-c4-100-2026-11-14/fp8/measurement": {
+      "requests_sha256": "784b95d34dfa2e09f327524926c2df97ab3287bbe4ac6aeb2219b17f2aadff94",
+      "trace_sha256": "f387617658581cb51597901134bdf082e0c075f9f1e1ef0cb374d964bffd43fb"
+    }
+  },
+  "rows": 200,
+  "matched_logical_requests": 100,
+  "split_counts": {
+    "train": 138,
+    "validation": 28,
+    "test": 34
+  },
+  "features_online_allowlist": [
+    "estimated_cached_tokens",
+    "input_tokens_estimate",
+    "output_limit",
+    "estimated_total_tokens",
+    "previous_turns",
+    "streaming",
+    "tool_call_mode",
+    "structured_output",
+    "thinking_enabled",
+    "priority",
+    "slo_ttft_ms",
+    "slo_e2e_ms",
+    "precision_fp8",
+    "precision_bf16",
+    "client_outstanding_requests",
+    "state_age_ms",
+    "active_requests",
+    "running_requests",
+    "queued_requests",
+    "running_sequences",
+    "running_tokens",
+    "kv_cache_usage",
+    "kv_cache_free_blocks",
+    "prefix_cache_hit_rate",
+    "recent_request_rate",
+    "recent_token_rate",
+    "uptime_seconds",
+    "recent_failures",
+    "time_since_last_request_seconds",
+    "gpu_utilization",
+    "memory_bandwidth_utilization",
+    "gpu_memory_bytes",
+    "system_memory_bytes",
+    "cpu_utilization",
+    "network_rtt_ms"
+  ],
+  "labels_not_online_features": [
+    "ttft_ms",
+    "e2e_ms",
+    "success",
+    "slo_met",
+    "output_tokens",
+    "actual_input_tokens",
+    "error_type",
+    "finish_reason"
+  ],
+  "warning": "This seed data has one matched run per precision and one workload family. Train for pipeline validation only; collect the planned multi-load campaign before promotion."
+}

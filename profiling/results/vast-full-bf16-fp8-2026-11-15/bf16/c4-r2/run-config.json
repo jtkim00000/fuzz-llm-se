@@ -1,0 +1,57 @@
+{
+  "policy": "single",
+  "concurrency": 4,
+  "sample_interval_seconds": 0.2,
+  "metrics_timeout_seconds": 3,
+  "request_timeout_seconds": 900,
+  "cache_condition": "prefix-reuse-minimized, not verified cold",
+  "workers": [
+    {
+      "id": "bf16",
+      "url": "http://192.168.99.13:18027",
+      "metrics_url": "http://192.168.99.13:18027/metrics",
+      "health_url": "http://192.168.99.13:18027/health",
+      "model": "nvidia/Qwen3.8-27B-NVFP4",
+      "manifest_path": "/results/vast-full-bf16-fp8-2026-11-15/bf16/manifests/worker.json",
+      "metric_map": {
+        "running_requests": {
+          "metric": "vllm:num_requests_running"
+        },
+        "queued_requests": {
+          "metric": "vllm:num_requests_waiting"
+        },
+        "kv_cache_usage": {
+          "metric": "vllm:kv_cache_usage_perc"
+        }
+      },
+      "manifest": {
+        "effective_configuration_verified": true,
+        "fuzzball_workflow_id": "52626fae-3879-4559-85c0-d2de4a124f96",
+        "worker_id": "bf16",
+        "engine_version": "vLLM 0.28.0",
+        "model_checkpoint": "nvidia/Qwen3.8-27B-NVFP4",
+        "model_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+        "tokenizer_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+        "served_model_id": "nvidia/Qwen3.8-27B-NVFP4",
+        "effective_kv_dtype": "bfloat16",
+        "attention_backend": "FLASH_ATTN",
+        "max_model_len": 8192,
+        "batching_settings": {
+          "max_num_seqs": 4,
+          "max_num_batched_tokens": 2048,
+          "gpu_memory_utilization": 0.6,
+          "kv_cache_memory_bytes": 8589934592,
+          "enforce_eager": true
+        },
+        "prefix_caching": true,
+        "warmup_and_cache_procedure": "separate preflight plus short/long warmup; prefix-reuse-minimized, not verified cold",
+        "missing_measurements": [
+          "KV scales",
+          "GPU exporter"
+        ],
+        "context_limit_decision": "fallback 7168 because both verified workers have max_model_len 8192"
+      },
+      "configuration_hash": "95f84b20bd51def2fe0fbe8c1df25402ec726d5e96f24158a5ea8fccf3ca76bd"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "policy": "single",
+  "concurrency": 4,
+  "sample_interval_seconds": 0.2,
+  "metrics_timeout_seconds": 3,
+  "request_timeout_seconds": 900,
+  "cache_condition": "prefix-reuse-minimized, not verified cold",
+  "workers": [
+    {
+      "id": "fp8",
+      "url": "http://192.168.99.12:18027",
+      "metrics_url": "http://192.168.99.12:18027/metrics",
+      "health_url": "http://192.168.99.12:18027/health",
+      "model": "nvidia/Qwen3.8-27B-NVFP4",
+      "manifest_path": "/results/vast-compact-bf16-fp8-2026-11-15/fp8/manifests/worker.json",
+      "metric_map": {
+        "running_requests": {
+          "metric": "vllm:num_requests_running"
+        },
+        "queued_requests": {
+          "metric": "vllm:num_requests_waiting"
+        },
+        "kv_cache_usage": {
+          "metric": "vllm:kv_cache_usage_perc"
+        }
+      },
+      "manifest": {
+        "effective_configuration_verified": true,
+        "fuzzball_workflow_id": "346f74e3-9826-45dc-adab-6bc95067fcc4",
+        "worker_id": "fp8",
+        "engine_version": "vLLM 0.28.0",
+        "model_checkpoint": "nvidia/Qwen3.8-27B-NVFP4",
+        "model_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+        "tokenizer_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+        "served_model_id": "nvidia/Qwen3.8-27B-NVFP4",
+        "effective_kv_dtype": "fp8",
+        "attention_backend": "FLASHINFER",
+        "max_model_len": 8192,
+        "batching_settings": {
+          "max_num_seqs": 4,
+          "max_num_batched_tokens": 2048,
+          "gpu_memory_utilization": 0.6,
+          "kv_cache_memory_bytes": 8589934592,
+          "enforce_eager": true
+        },
+        "prefix_caching": true,
+        "warmup_and_cache_procedure": "separate preflight plus short/long warmup; prefix-reuse-minimized, not verified cold",
+        "missing_measurements": [
+          "KV scales",
+          "GPU exporter"
+        ]
+      },
+      "configuration_hash": "baf5f34f6f706e7f65f95b9a02590d67897ae745cb372ee347f6c539109db249"
+    }
+  ]
+}

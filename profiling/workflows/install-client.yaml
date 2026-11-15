@@ -1,0 +1,36 @@
+version: v4
+volumes:
+  results:
+    name: profiling-results
+jobs:
+  install-client:
+    image:
+      uri: docker://python:3.11
+    mounts:
+      /results: results
+    resource:
+      cpu:
+        cores: 2
+      memory:
+        size: 4GB
+    script: |
+      #!/bin/sh
+      set -eu
+      ENV_ROOT=$(mktemp -d /results/benchmark-env-XXXXXXXX)
+      export ENV_ROOT
+      python -m venv "$ENV_ROOT/venv"
+      python - <<'PYCODE'
+      import os,subprocess
+      from pathlib import Path
+      root=Path(os.environ['ENV_ROOT'])
+      with (root/'install.log').open('w') as log:
+          result=subprocess.run([str(root/'venv/bin/python'),'-m','pip','install','aiperf==0.13.0','scikit-learn==1.7.2'],stdout=log,stderr=subprocess.STDOUT,timeout=900)
+      if result.returncode:
+          print((root/'install.log').read_text()[-6000:])
+          raise SystemExit(result.returncode)
+      PYCODE
+      "$ENV_ROOT/venv/bin/python" -m pip freeze > "$ENV_ROOT/requirements.lock.txt"
+      "$ENV_ROOT/venv/bin/python" -m pip show aiperf
+      "$ENV_ROOT/venv/bin/aiperf" profile --help > "$ENV_ROOT/aiperf-profile-help.txt"
+      uname -m > "$ENV_ROOT/architecture.txt"
+      printf 'CLIENT_ENV=%s\n' "$ENV_ROOT"

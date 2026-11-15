@@ -10,7 +10,9 @@ may resolve to BF16 or another format, so it is not automatically distinct
 from the explicit precision experiments.
 
 Nothing in this guide has been verified on the venue's actual hardware. The
-existing laptop smoke test uses Ollama and Llama, not vLLM or this model.
+earlier laptop smoke test used Ollama and Llama, not vLLM or this model.
+The VAST-backed preparation and verified answer keys are described in
+[profiling/README.md](../profiling/README.md).
 
 ## 1. Prepare and verify
 
@@ -36,7 +38,9 @@ existing laptop smoke test uses Ollama and Llama, not vLLM or this model.
 
 ## 2. Install AIPerf and run a pilot
 
-On a reachable client, install AIPerf as described in [profiling/README.md](../profiling/README.md).
+Use the prepared cluster client or install AIPerf as described in
+[profiling/README.md](../profiling/README.md). The example below uses a local
+virtual environment; cluster runs use the environment path in that guide.
 Set the following placeholders for the actual deployment. A local tokenizer
 directory from the pinned model revision is preferable. Supply credentials by
 the venue-approved method and never commit or print them.

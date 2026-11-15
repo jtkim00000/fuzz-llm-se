@@ -3,6 +3,9 @@
 import asyncio
 import logging
 import os
+import json
+import time
+import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from urllib.parse import urlsplit
@@ -26,7 +29,7 @@ class Worker:
             raise ValueError("Worker URL must be an HTTP(S) origin without a path")
 
 
-def create_app(workers: list[Worker], *, transport=None):
+def create_app(workers: list[Worker], *, transport=None, policy_provider=None, policy_model=None):
     if not workers or len({worker.name for worker in workers}) != len(workers):
         raise ValueError("At least one uniquely named worker is required")
     assignments: dict[str, str] = {}
@@ -68,6 +71,29 @@ def create_app(workers: list[Worker], *, transport=None):
         if not session or len(session) > 256:
             return JSONResponse({"error": {"message": "X-Session-ID is required (maximum 256 characters)", "type": "invalid_request_error"}}, status_code=400)
         body = await request.body()
+        request_id = uuid.uuid4().hex
+        shadow = None
+        # This adapter is deliberately shadow-only. The seed artifact cannot
+        # authorize promotion or change the existing forwarding route.
+        if policy_provider is not None:
+            from .policy import choose_new_session
+            try:
+                context = await policy_provider(request, body)
+            except Exception:
+                context = None
+            async with lock:
+                if session not in assignments:
+                    if context is None:
+                        shadow = {'policy':'rejected','fallback_reason':'snapshot_provider_failed'}
+                    else:
+                        features, candidates = context
+                        for worker_id, candidate in candidates.items():
+                            candidate['outstanding'] = active.get(worker_id, 0)
+                        shadow = choose_new_session(features, candidates, policy_model, now_ns=time.time_ns())
+                    # Contains allowlisted numeric features and reasons only;
+                    # request bodies, response content and credentials are absent.
+                    LOG.info(json.dumps({'event':'shadow_decision','request_id':request_id,
+                                        'session_id':session,'decision':shadow}))
         # Least outstanding requests, round-robin for ties. This is a baseline,
         # not a claim about true GPU load, latency, health, or precision.
         async with lock:
@@ -91,13 +117,18 @@ def create_app(workers: list[Worker], *, transport=None):
         url = worker.url.rstrip("/") + "/v1/chat/completions"
         if request.url.query:
             url += "?" + request.url.query
-        LOG.info("route worker=%s policy=least_outstanding", name)
+        dispatch_ns = time.time_ns()
+        LOG.info(json.dumps({'event':'dispatch','request_id':request_id,'session_id':session,
+                            'worker':name,'policy':'least_outstanding','dispatch_ns':dispatch_ns,
+                            'shadow_worker':None if shadow is None else shadow.get('worker_id')}))
         try:
             upstream = await request.app.state.client.send(request.app.state.client.build_request("POST", url, headers=headers, content=body), stream=True)
         except httpx.HTTPError as exc:
             async with lock:
                 active[name] -= 1
             status = 504 if isinstance(exc, httpx.TimeoutException) else 502
+            LOG.info(json.dumps({'event':'completion','request_id':request_id,'worker':name,
+                                'completed_ns':time.time_ns(),'error_type':type(exc).__name__,'status':status}))
             # Do not reroute: a request might already have reached the worker,
             # and an existing session's cache cannot be transferred.
             return JSONResponse({"error": {"message": "Assigned worker unavailable; session remains pinned", "type": "upstream_error"}}, status_code=status, headers={"X-Routed-Node": name, "X-Policy": "least_outstanding"})
@@ -105,13 +136,19 @@ def create_app(workers: list[Worker], *, transport=None):
         response_headers.update({"X-Routed-Node": name, "X-Policy": "least_outstanding"})
 
         async def forward():
+            outcome = 'closed_or_cancelled'
             try:
                 async for chunk in upstream.aiter_raw():
                     yield chunk
+                outcome = 'finished' if upstream.status_code < 400 else 'upstream_error'
             finally:
-                await upstream.aclose()
-                async with lock:
-                    active[name] -= 1
+                try:
+                    await upstream.aclose()
+                finally:
+                    async with lock:
+                        active[name] -= 1
+                    LOG.info(json.dumps({'event':'completion','request_id':request_id,'worker':name,
+                                        'completed_ns':time.time_ns(),'status':upstream.status_code,'outcome':outcome}))
 
         return StreamingResponse(forward(), status_code=upstream.status_code, headers=response_headers)
 

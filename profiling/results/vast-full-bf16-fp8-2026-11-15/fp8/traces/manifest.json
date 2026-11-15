@@ -1,0 +1,1195 @@
+{
+  "campaign": "vast-bf16-fp8-full-fallback-8192",
+  "source_sha256": "b8103a50d625ffb6acd18cddffcce0ceb0fdf36b19392d104c32bb1fcc7e2f9f",
+  "tokenizer": "/models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80",
+  "length_targets": [
+    512,
+    2048,
+    4096,
+    7168
+  ],
+  "output_targets": [
+    32,
+    256
+  ],
+  "concurrencies": [
+    1,
+    4
+  ],
+  "prompts_per_cell": 3,
+  "repetitions": 3,
+  "measured_requests_per_configuration": 144,
+  "prefix_cache_condition": "prefix-reuse-minimized, not verified cold",
+  "blocks": {
+    "c1-r1": [
+      {
+        "prompt_id": "vast-l2048-o256-p1-r1",
+        "logical_request_id": "vast-l2048-o256-p1-r1-c1",
+        "actual_input_tokens": 2088,
+        "requested_output_tokens": 256,
+        "position": 0,
+        "nonce": "full-vast-l2048-o256-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p1-r1",
+        "logical_request_id": "vast-l512-o32-p1-r1-c1",
+        "actual_input_tokens": 517,
+        "requested_output_tokens": 32,
+        "position": 1,
+        "nonce": "full-vast-l512-o32-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p2-r1",
+        "logical_request_id": "vast-l2048-o256-p2-r1-c1",
+        "actual_input_tokens": 2009,
+        "requested_output_tokens": 256,
+        "position": 2,
+        "nonce": "full-vast-l2048-o256-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p3-r1",
+        "logical_request_id": "vast-l2048-o256-p3-r1-c1",
+        "actual_input_tokens": 2013,
+        "requested_output_tokens": 256,
+        "position": 3,
+        "nonce": "full-vast-l2048-o256-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p3-r1",
+        "logical_request_id": "vast-l2048-o32-p3-r1-c1",
+        "actual_input_tokens": 2060,
+        "requested_output_tokens": 32,
+        "position": 4,
+        "nonce": "full-vast-l2048-o32-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p3-r1",
+        "logical_request_id": "vast-l4096-o32-p3-r1-c1",
+        "actual_input_tokens": 4167,
+        "requested_output_tokens": 32,
+        "position": 5,
+        "nonce": "full-vast-l4096-o32-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p2-r1",
+        "logical_request_id": "vast-l7168-o32-p2-r1-c1",
+        "actual_input_tokens": 7175,
+        "requested_output_tokens": 32,
+        "position": 6,
+        "nonce": "full-vast-l7168-o32-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p1-r1",
+        "logical_request_id": "vast-l7168-o32-p1-r1-c1",
+        "actual_input_tokens": 7300,
+        "requested_output_tokens": 32,
+        "position": 7,
+        "nonce": "full-vast-l7168-o32-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p2-r1",
+        "logical_request_id": "vast-l512-o32-p2-r1-c1",
+        "actual_input_tokens": 517,
+        "requested_output_tokens": 32,
+        "position": 8,
+        "nonce": "full-vast-l512-o32-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p3-r1",
+        "logical_request_id": "vast-l512-o32-p3-r1-c1",
+        "actual_input_tokens": 521,
+        "requested_output_tokens": 32,
+        "position": 9,
+        "nonce": "full-vast-l512-o32-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p2-r1",
+        "logical_request_id": "vast-l4096-o256-p2-r1-c1",
+        "actual_input_tokens": 4177,
+        "requested_output_tokens": 256,
+        "position": 10,
+        "nonce": "full-vast-l4096-o256-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p3-r1",
+        "logical_request_id": "vast-l4096-o256-p3-r1-c1",
+        "actual_input_tokens": 4065,
+        "requested_output_tokens": 256,
+        "position": 11,
+        "nonce": "full-vast-l4096-o256-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p1-r1",
+        "logical_request_id": "vast-l7168-o256-p1-r1-c1",
+        "actual_input_tokens": 7183,
+        "requested_output_tokens": 256,
+        "position": 12,
+        "nonce": "full-vast-l7168-o256-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p1-r1",
+        "logical_request_id": "vast-l2048-o32-p1-r1-c1",
+        "actual_input_tokens": 2042,
+        "requested_output_tokens": 32,
+        "position": 13,
+        "nonce": "full-vast-l2048-o32-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p2-r1",
+        "logical_request_id": "vast-l7168-o256-p2-r1-c1",
+        "actual_input_tokens": 7053,
+        "requested_output_tokens": 256,
+        "position": 14,
+        "nonce": "full-vast-l7168-o256-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p3-r1",
+        "logical_request_id": "vast-l7168-o32-p3-r1-c1",
+        "actual_input_tokens": 7251,
+        "requested_output_tokens": 32,
+        "position": 15,
+        "nonce": "full-vast-l7168-o32-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p2-r1",
+        "logical_request_id": "vast-l4096-o32-p2-r1-c1",
+        "actual_input_tokens": 4021,
+        "requested_output_tokens": 32,
+        "position": 16,
+        "nonce": "full-vast-l4096-o32-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p2-r1",
+        "logical_request_id": "vast-l512-o256-p2-r1-c1",
+        "actual_input_tokens": 515,
+        "requested_output_tokens": 256,
+        "position": 17,
+        "nonce": "full-vast-l512-o256-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p1-r1",
+        "logical_request_id": "vast-l512-o256-p1-r1-c1",
+        "actual_input_tokens": 517,
+        "requested_output_tokens": 256,
+        "position": 18,
+        "nonce": "full-vast-l512-o256-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p1-r1",
+        "logical_request_id": "vast-l4096-o256-p1-r1-c1",
+        "actual_input_tokens": 4164,
+        "requested_output_tokens": 256,
+        "position": 19,
+        "nonce": "full-vast-l4096-o256-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p3-r1",
+        "logical_request_id": "vast-l512-o256-p3-r1-c1",
+        "actual_input_tokens": 519,
+        "requested_output_tokens": 256,
+        "position": 20,
+        "nonce": "full-vast-l512-o256-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p2-r1",
+        "logical_request_id": "vast-l2048-o32-p2-r1-c1",
+        "actual_input_tokens": 2079,
+        "requested_output_tokens": 32,
+        "position": 21,
+        "nonce": "full-vast-l2048-o32-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p3-r1",
+        "logical_request_id": "vast-l7168-o256-p3-r1-c1",
+        "actual_input_tokens": 7046,
+        "requested_output_tokens": 256,
+        "position": 22,
+        "nonce": "full-vast-l7168-o256-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p1-r1",
+        "logical_request_id": "vast-l4096-o32-p1-r1-c1",
+        "actual_input_tokens": 4158,
+        "requested_output_tokens": 32,
+        "position": 23,
+        "nonce": "full-vast-l4096-o32-p1-r1"
+      }
+    ],
+    "c1-r1_trace_sha256": "803225adad1cc58e63924c72680568e476d5e3b50a83195d3a31cec88c9af2e0",
+    "c1-r2": [
+      {
+        "prompt_id": "vast-l2048-o32-p3-r2",
+        "logical_request_id": "vast-l2048-o32-p3-r2-c1",
+        "actual_input_tokens": 2083,
+        "requested_output_tokens": 32,
+        "position": 0,
+        "nonce": "full-vast-l2048-o32-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p1-r2",
+        "logical_request_id": "vast-l512-o256-p1-r2-c1",
+        "actual_input_tokens": 511,
+        "requested_output_tokens": 256,
+        "position": 1,
+        "nonce": "full-vast-l512-o256-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p3-r2",
+        "logical_request_id": "vast-l4096-o32-p3-r2-c1",
+        "actual_input_tokens": 4055,
+        "requested_output_tokens": 32,
+        "position": 2,
+        "nonce": "full-vast-l4096-o32-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p2-r2",
+        "logical_request_id": "vast-l512-o256-p2-r2-c1",
+        "actual_input_tokens": 507,
+        "requested_output_tokens": 256,
+        "position": 3,
+        "nonce": "full-vast-l512-o256-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p2-r2",
+        "logical_request_id": "vast-l4096-o32-p2-r2-c1",
+        "actual_input_tokens": 4040,
+        "requested_output_tokens": 32,
+        "position": 4,
+        "nonce": "full-vast-l4096-o32-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p3-r2",
+        "logical_request_id": "vast-l512-o32-p3-r2-c1",
+        "actual_input_tokens": 518,
+        "requested_output_tokens": 32,
+        "position": 5,
+        "nonce": "full-vast-l512-o32-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p3-r2",
+        "logical_request_id": "vast-l512-o256-p3-r2-c1",
+        "actual_input_tokens": 507,
+        "requested_output_tokens": 256,
+        "position": 6,
+        "nonce": "full-vast-l512-o256-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p2-r2",
+        "logical_request_id": "vast-l2048-o32-p2-r2-c1",
+        "actual_input_tokens": 2078,
+        "requested_output_tokens": 32,
+        "position": 7,
+        "nonce": "full-vast-l2048-o32-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p1-r2",
+        "logical_request_id": "vast-l7168-o32-p1-r2-c1",
+        "actual_input_tokens": 7277,
+        "requested_output_tokens": 32,
+        "position": 8,
+        "nonce": "full-vast-l7168-o32-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p1-r2",
+        "logical_request_id": "vast-l512-o32-p1-r2-c1",
+        "actual_input_tokens": 502,
+        "requested_output_tokens": 32,
+        "position": 9,
+        "nonce": "full-vast-l512-o32-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p1-r2",
+        "logical_request_id": "vast-l2048-o256-p1-r2-c1",
+        "actual_input_tokens": 2068,
+        "requested_output_tokens": 256,
+        "position": 10,
+        "nonce": "full-vast-l2048-o256-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p1-r2",
+        "logical_request_id": "vast-l4096-o256-p1-r2-c1",
+        "actual_input_tokens": 4176,
+        "requested_output_tokens": 256,
+        "position": 11,
+        "nonce": "full-vast-l4096-o256-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p3-r2",
+        "logical_request_id": "vast-l7168-o256-p3-r2-c1",
+        "actual_input_tokens": 7255,
+        "requested_output_tokens": 256,
+        "position": 12,
+        "nonce": "full-vast-l7168-o256-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p2-r2",
+        "logical_request_id": "vast-l7168-o32-p2-r2-c1",
+        "actual_input_tokens": 7264,
+        "requested_output_tokens": 32,
+        "position": 13,
+        "nonce": "full-vast-l7168-o32-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p3-r2",
+        "logical_request_id": "vast-l7168-o32-p3-r2-c1",
+        "actual_input_tokens": 7063,
+        "requested_output_tokens": 32,
+        "position": 14,
+        "nonce": "full-vast-l7168-o32-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p1-r2",
+        "logical_request_id": "vast-l2048-o32-p1-r2-c1",
+        "actual_input_tokens": 2074,
+        "requested_output_tokens": 32,
+        "position": 15,
+        "nonce": "full-vast-l2048-o32-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p2-r2",
+        "logical_request_id": "vast-l512-o32-p2-r2-c1",
+        "actual_input_tokens": 513,
+        "requested_output_tokens": 32,
+        "position": 16,
+        "nonce": "full-vast-l512-o32-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p3-r2",
+        "logical_request_id": "vast-l2048-o256-p3-r2-c1",
+        "actual_input_tokens": 2079,
+        "requested_output_tokens": 256,
+        "position": 17,
+        "nonce": "full-vast-l2048-o256-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p1-r2",
+        "logical_request_id": "vast-l4096-o32-p1-r2-c1",
+        "actual_input_tokens": 4165,
+        "requested_output_tokens": 32,
+        "position": 18,
+        "nonce": "full-vast-l4096-o32-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p1-r2",
+        "logical_request_id": "vast-l7168-o256-p1-r2-c1",
+        "actual_input_tokens": 7182,
+        "requested_output_tokens": 256,
+        "position": 19,
+        "nonce": "full-vast-l7168-o256-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p2-r2",
+        "logical_request_id": "vast-l2048-o256-p2-r2-c1",
+        "actual_input_tokens": 2071,
+        "requested_output_tokens": 256,
+        "position": 20,
+        "nonce": "full-vast-l2048-o256-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p2-r2",
+        "logical_request_id": "vast-l7168-o256-p2-r2-c1",
+        "actual_input_tokens": 7127,
+        "requested_output_tokens": 256,
+        "position": 21,
+        "nonce": "full-vast-l7168-o256-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p2-r2",
+        "logical_request_id": "vast-l4096-o256-p2-r2-c1",
+        "actual_input_tokens": 4151,
+        "requested_output_tokens": 256,
+        "position": 22,
+        "nonce": "full-vast-l4096-o256-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p3-r2",
+        "logical_request_id": "vast-l4096-o256-p3-r2-c1",
+        "actual_input_tokens": 4078,
+        "requested_output_tokens": 256,
+        "position": 23,
+        "nonce": "full-vast-l4096-o256-p3-r2"
+      }
+    ],
+    "c1-r2_trace_sha256": "62709b8cbdbaa5f7453d0837fd18afb3a987cf3c3a27aea52e4c27d425da10ce",
+    "c1-r3": [
+      {
+        "prompt_id": "vast-l7168-o256-p1-r3",
+        "logical_request_id": "vast-l7168-o256-p1-r3-c1",
+        "actual_input_tokens": 7173,
+        "requested_output_tokens": 256,
+        "position": 0,
+        "nonce": "full-vast-l7168-o256-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p1-r3",
+        "logical_request_id": "vast-l512-o32-p1-r3-c1",
+        "actual_input_tokens": 513,
+        "requested_output_tokens": 32,
+        "position": 1,
+        "nonce": "full-vast-l512-o32-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p3-r3",
+        "logical_request_id": "vast-l2048-o32-p3-r3-c1",
+        "actual_input_tokens": 2078,
+        "requested_output_tokens": 32,
+        "position": 2,
+        "nonce": "full-vast-l2048-o32-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p1-r3",
+        "logical_request_id": "vast-l2048-o256-p1-r3-c1",
+        "actual_input_tokens": 2085,
+        "requested_output_tokens": 256,
+        "position": 3,
+        "nonce": "full-vast-l2048-o256-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p2-r3",
+        "logical_request_id": "vast-l512-o32-p2-r3-c1",
+        "actual_input_tokens": 521,
+        "requested_output_tokens": 32,
+        "position": 4,
+        "nonce": "full-vast-l512-o32-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p2-r3",
+        "logical_request_id": "vast-l4096-o256-p2-r3-c1",
+        "actual_input_tokens": 4165,
+        "requested_output_tokens": 256,
+        "position": 5,
+        "nonce": "full-vast-l4096-o256-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p2-r3",
+        "logical_request_id": "vast-l7168-o256-p2-r3-c1",
+        "actual_input_tokens": 7059,
+        "requested_output_tokens": 256,
+        "position": 6,
+        "nonce": "full-vast-l7168-o256-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p1-r3",
+        "logical_request_id": "vast-l7168-o32-p1-r3-c1",
+        "actual_input_tokens": 7286,
+        "requested_output_tokens": 32,
+        "position": 7,
+        "nonce": "full-vast-l7168-o32-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p3-r3",
+        "logical_request_id": "vast-l7168-o256-p3-r3-c1",
+        "actual_input_tokens": 7207,
+        "requested_output_tokens": 256,
+        "position": 8,
+        "nonce": "full-vast-l7168-o256-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p3-r3",
+        "logical_request_id": "vast-l4096-o256-p3-r3-c1",
+        "actual_input_tokens": 4159,
+        "requested_output_tokens": 256,
+        "position": 9,
+        "nonce": "full-vast-l4096-o256-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p3-r3",
+        "logical_request_id": "vast-l2048-o256-p3-r3-c1",
+        "actual_input_tokens": 2082,
+        "requested_output_tokens": 256,
+        "position": 10,
+        "nonce": "full-vast-l2048-o256-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p2-r3",
+        "logical_request_id": "vast-l4096-o32-p2-r3-c1",
+        "actual_input_tokens": 4087,
+        "requested_output_tokens": 32,
+        "position": 11,
+        "nonce": "full-vast-l4096-o32-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p1-r3",
+        "logical_request_id": "vast-l2048-o32-p1-r3-c1",
+        "actual_input_tokens": 2087,
+        "requested_output_tokens": 32,
+        "position": 12,
+        "nonce": "full-vast-l2048-o32-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p2-r3",
+        "logical_request_id": "vast-l7168-o32-p2-r3-c1",
+        "actual_input_tokens": 7036,
+        "requested_output_tokens": 32,
+        "position": 13,
+        "nonce": "full-vast-l7168-o32-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p3-r3",
+        "logical_request_id": "vast-l7168-o32-p3-r3-c1",
+        "actual_input_tokens": 7305,
+        "requested_output_tokens": 32,
+        "position": 14,
+        "nonce": "full-vast-l7168-o32-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p2-r3",
+        "logical_request_id": "vast-l2048-o32-p2-r3-c1",
+        "actual_input_tokens": 2073,
+        "requested_output_tokens": 32,
+        "position": 15,
+        "nonce": "full-vast-l2048-o32-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p1-r3",
+        "logical_request_id": "vast-l512-o256-p1-r3-c1",
+        "actual_input_tokens": 514,
+        "requested_output_tokens": 256,
+        "position": 16,
+        "nonce": "full-vast-l512-o256-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p3-r3",
+        "logical_request_id": "vast-l4096-o32-p3-r3-c1",
+        "actual_input_tokens": 4163,
+        "requested_output_tokens": 32,
+        "position": 17,
+        "nonce": "full-vast-l4096-o32-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p2-r3",
+        "logical_request_id": "vast-l2048-o256-p2-r3-c1",
+        "actual_input_tokens": 2075,
+        "requested_output_tokens": 256,
+        "position": 18,
+        "nonce": "full-vast-l2048-o256-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p3-r3",
+        "logical_request_id": "vast-l512-o32-p3-r3-c1",
+        "actual_input_tokens": 503,
+        "requested_output_tokens": 32,
+        "position": 19,
+        "nonce": "full-vast-l512-o32-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p1-r3",
+        "logical_request_id": "vast-l4096-o256-p1-r3-c1",
+        "actual_input_tokens": 4172,
+        "requested_output_tokens": 256,
+        "position": 20,
+        "nonce": "full-vast-l4096-o256-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p2-r3",
+        "logical_request_id": "vast-l512-o256-p2-r3-c1",
+        "actual_input_tokens": 518,
+        "requested_output_tokens": 256,
+        "position": 21,
+        "nonce": "full-vast-l512-o256-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p1-r3",
+        "logical_request_id": "vast-l4096-o32-p1-r3-c1",
+        "actual_input_tokens": 4155,
+        "requested_output_tokens": 32,
+        "position": 22,
+        "nonce": "full-vast-l4096-o32-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p3-r3",
+        "logical_request_id": "vast-l512-o256-p3-r3-c1",
+        "actual_input_tokens": 502,
+        "requested_output_tokens": 256,
+        "position": 23,
+        "nonce": "full-vast-l512-o256-p3-r3"
+      }
+    ],
+    "c1-r3_trace_sha256": "12b0ac22fbabd01091d2ca780d40e59f054686727387e95b3d03c9cfbc2cdd88",
+    "c4-r1": [
+      {
+        "prompt_id": "vast-l2048-o256-p2-r1",
+        "logical_request_id": "vast-l2048-o256-p2-r1-c4",
+        "actual_input_tokens": 2009,
+        "requested_output_tokens": 256,
+        "position": 0,
+        "nonce": "full-vast-l2048-o256-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p2-r1",
+        "logical_request_id": "vast-l7168-o32-p2-r1-c4",
+        "actual_input_tokens": 7175,
+        "requested_output_tokens": 32,
+        "position": 1,
+        "nonce": "full-vast-l7168-o32-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p3-r1",
+        "logical_request_id": "vast-l4096-o32-p3-r1-c4",
+        "actual_input_tokens": 4167,
+        "requested_output_tokens": 32,
+        "position": 2,
+        "nonce": "full-vast-l4096-o32-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p1-r1",
+        "logical_request_id": "vast-l512-o32-p1-r1-c4",
+        "actual_input_tokens": 517,
+        "requested_output_tokens": 32,
+        "position": 3,
+        "nonce": "full-vast-l512-o32-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p2-r1",
+        "logical_request_id": "vast-l4096-o32-p2-r1-c4",
+        "actual_input_tokens": 4021,
+        "requested_output_tokens": 32,
+        "position": 4,
+        "nonce": "full-vast-l4096-o32-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p1-r1",
+        "logical_request_id": "vast-l2048-o32-p1-r1-c4",
+        "actual_input_tokens": 2042,
+        "requested_output_tokens": 32,
+        "position": 5,
+        "nonce": "full-vast-l2048-o32-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p2-r1",
+        "logical_request_id": "vast-l512-o256-p2-r1-c4",
+        "actual_input_tokens": 515,
+        "requested_output_tokens": 256,
+        "position": 6,
+        "nonce": "full-vast-l512-o256-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p2-r1",
+        "logical_request_id": "vast-l7168-o256-p2-r1-c4",
+        "actual_input_tokens": 7053,
+        "requested_output_tokens": 256,
+        "position": 7,
+        "nonce": "full-vast-l7168-o256-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p1-r1",
+        "logical_request_id": "vast-l4096-o32-p1-r1-c4",
+        "actual_input_tokens": 4158,
+        "requested_output_tokens": 32,
+        "position": 8,
+        "nonce": "full-vast-l4096-o32-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p3-r1",
+        "logical_request_id": "vast-l512-o256-p3-r1-c4",
+        "actual_input_tokens": 519,
+        "requested_output_tokens": 256,
+        "position": 9,
+        "nonce": "full-vast-l512-o256-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p1-r1",
+        "logical_request_id": "vast-l7168-o32-p1-r1-c4",
+        "actual_input_tokens": 7300,
+        "requested_output_tokens": 32,
+        "position": 10,
+        "nonce": "full-vast-l7168-o32-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p3-r1",
+        "logical_request_id": "vast-l7168-o256-p3-r1-c4",
+        "actual_input_tokens": 7046,
+        "requested_output_tokens": 256,
+        "position": 11,
+        "nonce": "full-vast-l7168-o256-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p2-r1",
+        "logical_request_id": "vast-l2048-o32-p2-r1-c4",
+        "actual_input_tokens": 2079,
+        "requested_output_tokens": 32,
+        "position": 12,
+        "nonce": "full-vast-l2048-o32-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p3-r1",
+        "logical_request_id": "vast-l7168-o32-p3-r1-c4",
+        "actual_input_tokens": 7251,
+        "requested_output_tokens": 32,
+        "position": 13,
+        "nonce": "full-vast-l7168-o32-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p3-r1",
+        "logical_request_id": "vast-l2048-o32-p3-r1-c4",
+        "actual_input_tokens": 2060,
+        "requested_output_tokens": 32,
+        "position": 14,
+        "nonce": "full-vast-l2048-o32-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p1-r1",
+        "logical_request_id": "vast-l512-o256-p1-r1-c4",
+        "actual_input_tokens": 517,
+        "requested_output_tokens": 256,
+        "position": 15,
+        "nonce": "full-vast-l512-o256-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p3-r1",
+        "logical_request_id": "vast-l512-o32-p3-r1-c4",
+        "actual_input_tokens": 521,
+        "requested_output_tokens": 32,
+        "position": 16,
+        "nonce": "full-vast-l512-o32-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p2-r1",
+        "logical_request_id": "vast-l4096-o256-p2-r1-c4",
+        "actual_input_tokens": 4177,
+        "requested_output_tokens": 256,
+        "position": 17,
+        "nonce": "full-vast-l4096-o256-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p1-r1",
+        "logical_request_id": "vast-l7168-o256-p1-r1-c4",
+        "actual_input_tokens": 7183,
+        "requested_output_tokens": 256,
+        "position": 18,
+        "nonce": "full-vast-l7168-o256-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p3-r1",
+        "logical_request_id": "vast-l2048-o256-p3-r1-c4",
+        "actual_input_tokens": 2013,
+        "requested_output_tokens": 256,
+        "position": 19,
+        "nonce": "full-vast-l2048-o256-p3-r1"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p2-r1",
+        "logical_request_id": "vast-l512-o32-p2-r1-c4",
+        "actual_input_tokens": 517,
+        "requested_output_tokens": 32,
+        "position": 20,
+        "nonce": "full-vast-l512-o32-p2-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p1-r1",
+        "logical_request_id": "vast-l4096-o256-p1-r1-c4",
+        "actual_input_tokens": 4164,
+        "requested_output_tokens": 256,
+        "position": 21,
+        "nonce": "full-vast-l4096-o256-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p1-r1",
+        "logical_request_id": "vast-l2048-o256-p1-r1-c4",
+        "actual_input_tokens": 2088,
+        "requested_output_tokens": 256,
+        "position": 22,
+        "nonce": "full-vast-l2048-o256-p1-r1"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p3-r1",
+        "logical_request_id": "vast-l4096-o256-p3-r1-c4",
+        "actual_input_tokens": 4065,
+        "requested_output_tokens": 256,
+        "position": 23,
+        "nonce": "full-vast-l4096-o256-p3-r1"
+      }
+    ],
+    "c4-r1_trace_sha256": "de6378e4e514d3205cc5e7aeaeed8f4373d60e61a7e46a055b3c2d13ab189af0",
+    "c4-r2": [
+      {
+        "prompt_id": "vast-l2048-o32-p1-r2",
+        "logical_request_id": "vast-l2048-o32-p1-r2-c4",
+        "actual_input_tokens": 2074,
+        "requested_output_tokens": 32,
+        "position": 0,
+        "nonce": "full-vast-l2048-o32-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p2-r2",
+        "logical_request_id": "vast-l2048-o256-p2-r2-c4",
+        "actual_input_tokens": 2071,
+        "requested_output_tokens": 256,
+        "position": 1,
+        "nonce": "full-vast-l2048-o256-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p2-r2",
+        "logical_request_id": "vast-l7168-o256-p2-r2-c4",
+        "actual_input_tokens": 7127,
+        "requested_output_tokens": 256,
+        "position": 2,
+        "nonce": "full-vast-l7168-o256-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p2-r2",
+        "logical_request_id": "vast-l512-o32-p2-r2-c4",
+        "actual_input_tokens": 513,
+        "requested_output_tokens": 32,
+        "position": 3,
+        "nonce": "full-vast-l512-o32-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p1-r2",
+        "logical_request_id": "vast-l2048-o256-p1-r2-c4",
+        "actual_input_tokens": 2068,
+        "requested_output_tokens": 256,
+        "position": 4,
+        "nonce": "full-vast-l2048-o256-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p1-r2",
+        "logical_request_id": "vast-l512-o256-p1-r2-c4",
+        "actual_input_tokens": 511,
+        "requested_output_tokens": 256,
+        "position": 5,
+        "nonce": "full-vast-l512-o256-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p3-r2",
+        "logical_request_id": "vast-l2048-o32-p3-r2-c4",
+        "actual_input_tokens": 2083,
+        "requested_output_tokens": 32,
+        "position": 6,
+        "nonce": "full-vast-l2048-o32-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p2-r2",
+        "logical_request_id": "vast-l2048-o32-p2-r2-c4",
+        "actual_input_tokens": 2078,
+        "requested_output_tokens": 32,
+        "position": 7,
+        "nonce": "full-vast-l2048-o32-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p3-r2",
+        "logical_request_id": "vast-l2048-o256-p3-r2-c4",
+        "actual_input_tokens": 2079,
+        "requested_output_tokens": 256,
+        "position": 8,
+        "nonce": "full-vast-l2048-o256-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p3-r2",
+        "logical_request_id": "vast-l4096-o32-p3-r2-c4",
+        "actual_input_tokens": 4055,
+        "requested_output_tokens": 32,
+        "position": 9,
+        "nonce": "full-vast-l4096-o32-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p3-r2",
+        "logical_request_id": "vast-l512-o256-p3-r2-c4",
+        "actual_input_tokens": 507,
+        "requested_output_tokens": 256,
+        "position": 10,
+        "nonce": "full-vast-l512-o256-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p3-r2",
+        "logical_request_id": "vast-l7168-o32-p3-r2-c4",
+        "actual_input_tokens": 7063,
+        "requested_output_tokens": 32,
+        "position": 11,
+        "nonce": "full-vast-l7168-o32-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p1-r2",
+        "logical_request_id": "vast-l4096-o256-p1-r2-c4",
+        "actual_input_tokens": 4176,
+        "requested_output_tokens": 256,
+        "position": 12,
+        "nonce": "full-vast-l4096-o256-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p3-r2",
+        "logical_request_id": "vast-l4096-o256-p3-r2-c4",
+        "actual_input_tokens": 4078,
+        "requested_output_tokens": 256,
+        "position": 13,
+        "nonce": "full-vast-l4096-o256-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p3-r2",
+        "logical_request_id": "vast-l512-o32-p3-r2-c4",
+        "actual_input_tokens": 518,
+        "requested_output_tokens": 32,
+        "position": 14,
+        "nonce": "full-vast-l512-o32-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p1-r2",
+        "logical_request_id": "vast-l7168-o32-p1-r2-c4",
+        "actual_input_tokens": 7277,
+        "requested_output_tokens": 32,
+        "position": 15,
+        "nonce": "full-vast-l7168-o32-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p3-r2",
+        "logical_request_id": "vast-l7168-o256-p3-r2-c4",
+        "actual_input_tokens": 7255,
+        "requested_output_tokens": 256,
+        "position": 16,
+        "nonce": "full-vast-l7168-o256-p3-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p1-r2",
+        "logical_request_id": "vast-l512-o32-p1-r2-c4",
+        "actual_input_tokens": 502,
+        "requested_output_tokens": 32,
+        "position": 17,
+        "nonce": "full-vast-l512-o32-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p1-r2",
+        "logical_request_id": "vast-l7168-o256-p1-r2-c4",
+        "actual_input_tokens": 7182,
+        "requested_output_tokens": 256,
+        "position": 18,
+        "nonce": "full-vast-l7168-o256-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p2-r2",
+        "logical_request_id": "vast-l512-o256-p2-r2-c4",
+        "actual_input_tokens": 507,
+        "requested_output_tokens": 256,
+        "position": 19,
+        "nonce": "full-vast-l512-o256-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p2-r2",
+        "logical_request_id": "vast-l7168-o32-p2-r2-c4",
+        "actual_input_tokens": 7264,
+        "requested_output_tokens": 32,
+        "position": 20,
+        "nonce": "full-vast-l7168-o32-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p1-r2",
+        "logical_request_id": "vast-l4096-o32-p1-r2-c4",
+        "actual_input_tokens": 4165,
+        "requested_output_tokens": 32,
+        "position": 21,
+        "nonce": "full-vast-l4096-o32-p1-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p2-r2",
+        "logical_request_id": "vast-l4096-o256-p2-r2-c4",
+        "actual_input_tokens": 4151,
+        "requested_output_tokens": 256,
+        "position": 22,
+        "nonce": "full-vast-l4096-o256-p2-r2"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p2-r2",
+        "logical_request_id": "vast-l4096-o32-p2-r2-c4",
+        "actual_input_tokens": 4040,
+        "requested_output_tokens": 32,
+        "position": 23,
+        "nonce": "full-vast-l4096-o32-p2-r2"
+      }
+    ],
+    "c4-r2_trace_sha256": "b6fd192f361762e2c8409034e5aa0a0e85847ec66ec7a0c8dc2549de38351a9c",
+    "c4-r3": [
+      {
+        "prompt_id": "vast-l4096-o32-p3-r3",
+        "logical_request_id": "vast-l4096-o32-p3-r3-c4",
+        "actual_input_tokens": 4163,
+        "requested_output_tokens": 32,
+        "position": 0,
+        "nonce": "full-vast-l4096-o32-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p1-r3",
+        "logical_request_id": "vast-l7168-o32-p1-r3-c4",
+        "actual_input_tokens": 7286,
+        "requested_output_tokens": 32,
+        "position": 1,
+        "nonce": "full-vast-l7168-o32-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p2-r3",
+        "logical_request_id": "vast-l4096-o32-p2-r3-c4",
+        "actual_input_tokens": 4087,
+        "requested_output_tokens": 32,
+        "position": 2,
+        "nonce": "full-vast-l4096-o32-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p1-r3",
+        "logical_request_id": "vast-l512-o32-p1-r3-c4",
+        "actual_input_tokens": 513,
+        "requested_output_tokens": 32,
+        "position": 3,
+        "nonce": "full-vast-l512-o32-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p2-r3",
+        "logical_request_id": "vast-l512-o32-p2-r3-c4",
+        "actual_input_tokens": 521,
+        "requested_output_tokens": 32,
+        "position": 4,
+        "nonce": "full-vast-l512-o32-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p2-r3",
+        "logical_request_id": "vast-l2048-o32-p2-r3-c4",
+        "actual_input_tokens": 2073,
+        "requested_output_tokens": 32,
+        "position": 5,
+        "nonce": "full-vast-l2048-o32-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p3-r3",
+        "logical_request_id": "vast-l7168-o32-p3-r3-c4",
+        "actual_input_tokens": 7305,
+        "requested_output_tokens": 32,
+        "position": 6,
+        "nonce": "full-vast-l7168-o32-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p1-r3",
+        "logical_request_id": "vast-l512-o256-p1-r3-c4",
+        "actual_input_tokens": 514,
+        "requested_output_tokens": 256,
+        "position": 7,
+        "nonce": "full-vast-l512-o256-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p3-r3",
+        "logical_request_id": "vast-l4096-o256-p3-r3-c4",
+        "actual_input_tokens": 4159,
+        "requested_output_tokens": 256,
+        "position": 8,
+        "nonce": "full-vast-l4096-o256-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p3-r3",
+        "logical_request_id": "vast-l2048-o32-p3-r3-c4",
+        "actual_input_tokens": 2078,
+        "requested_output_tokens": 32,
+        "position": 9,
+        "nonce": "full-vast-l2048-o32-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o32-p3-r3",
+        "logical_request_id": "vast-l512-o32-p3-r3-c4",
+        "actual_input_tokens": 503,
+        "requested_output_tokens": 32,
+        "position": 10,
+        "nonce": "full-vast-l512-o32-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p3-r3",
+        "logical_request_id": "vast-l2048-o256-p3-r3-c4",
+        "actual_input_tokens": 2082,
+        "requested_output_tokens": 256,
+        "position": 11,
+        "nonce": "full-vast-l2048-o256-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p2-r3",
+        "logical_request_id": "vast-l4096-o256-p2-r3-c4",
+        "actual_input_tokens": 4165,
+        "requested_output_tokens": 256,
+        "position": 12,
+        "nonce": "full-vast-l4096-o256-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p3-r3",
+        "logical_request_id": "vast-l7168-o256-p3-r3-c4",
+        "actual_input_tokens": 7207,
+        "requested_output_tokens": 256,
+        "position": 13,
+        "nonce": "full-vast-l7168-o256-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p2-r3",
+        "logical_request_id": "vast-l2048-o256-p2-r3-c4",
+        "actual_input_tokens": 2075,
+        "requested_output_tokens": 256,
+        "position": 14,
+        "nonce": "full-vast-l2048-o256-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p3-r3",
+        "logical_request_id": "vast-l512-o256-p3-r3-c4",
+        "actual_input_tokens": 502,
+        "requested_output_tokens": 256,
+        "position": 15,
+        "nonce": "full-vast-l512-o256-p3-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o256-p1-r3",
+        "logical_request_id": "vast-l4096-o256-p1-r3-c4",
+        "actual_input_tokens": 4172,
+        "requested_output_tokens": 256,
+        "position": 16,
+        "nonce": "full-vast-l4096-o256-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o32-p1-r3",
+        "logical_request_id": "vast-l2048-o32-p1-r3-c4",
+        "actual_input_tokens": 2087,
+        "requested_output_tokens": 32,
+        "position": 17,
+        "nonce": "full-vast-l2048-o32-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p2-r3",
+        "logical_request_id": "vast-l7168-o256-p2-r3-c4",
+        "actual_input_tokens": 7059,
+        "requested_output_tokens": 256,
+        "position": 18,
+        "nonce": "full-vast-l7168-o256-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l4096-o32-p1-r3",
+        "logical_request_id": "vast-l4096-o32-p1-r3-c4",
+        "actual_input_tokens": 4155,
+        "requested_output_tokens": 32,
+        "position": 19,
+        "nonce": "full-vast-l4096-o32-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o32-p2-r3",
+        "logical_request_id": "vast-l7168-o32-p2-r3-c4",
+        "actual_input_tokens": 7036,
+        "requested_output_tokens": 32,
+        "position": 20,
+        "nonce": "full-vast-l7168-o32-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l2048-o256-p1-r3",
+        "logical_request_id": "vast-l2048-o256-p1-r3-c4",
+        "actual_input_tokens": 2085,
+        "requested_output_tokens": 256,
+        "position": 21,
+        "nonce": "full-vast-l2048-o256-p1-r3"
+      },
+      {
+        "prompt_id": "vast-l512-o256-p2-r3",
+        "logical_request_id": "vast-l512-o256-p2-r3-c4",
+        "actual_input_tokens": 518,
+        "requested_output_tokens": 256,
+        "position": 22,
+        "nonce": "full-vast-l512-o256-p2-r3"
+      },
+      {
+        "prompt_id": "vast-l7168-o256-p1-r3",
+        "logical_request_id": "vast-l7168-o256-p1-r3-c4",
+        "actual_input_tokens": 7173,
+        "requested_output_tokens": 256,
+        "position": 23,
+        "nonce": "full-vast-l7168-o256-p1-r3"
+      }
+    ],
+    "c4-r3_trace_sha256": "c3f55a144e03f31d9a8ad47a8f7b33b0070df01b26f4f98141c01ea79efea7e8"
+  }
+}

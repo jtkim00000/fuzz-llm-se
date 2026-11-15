@@ -1,0 +1,140 @@
+{
+  "campaign": "tomorrow-30min-bf16-fp8",
+  "source_sha256": "b8103a50d625ffb6acd18cddffcce0ceb0fdf36b19392d104c32bb1fcc7e2f9f",
+  "tokenizer": "/models/nvidia--Qwen3.8-27B-NVFP4/482ca0f3832238542f8f5295dde86b5f22711d80",
+  "length_targets": [
+    512,
+    2048,
+    4096,
+    7168
+  ],
+  "output_targets": [
+    32,
+    256
+  ],
+  "concurrencies": [
+    1,
+    4
+  ],
+  "prefix_cache_condition": "prefix-reuse-minimized, not verified cold",
+  "blocks": {
+    "1": [
+      {
+        "logical_request_id": "compact-vast-l512-o32-c1",
+        "actual_input_tokens": 517,
+        "requested_output_tokens": 32,
+        "position": 0,
+        "nonce": "cp30-compact-vast-l512-o32-c1"
+      },
+      {
+        "logical_request_id": "compact-vast-l2048-o256-c1",
+        "actual_input_tokens": 2081,
+        "requested_output_tokens": 256,
+        "position": 1,
+        "nonce": "cp30-compact-vast-l2048-o256-c1"
+      },
+      {
+        "logical_request_id": "compact-vast-l7168-o32-c1",
+        "actual_input_tokens": 7073,
+        "requested_output_tokens": 32,
+        "position": 2,
+        "nonce": "cp30-compact-vast-l7168-o32-c1"
+      },
+      {
+        "logical_request_id": "compact-vast-l2048-o32-c1",
+        "actual_input_tokens": 2053,
+        "requested_output_tokens": 32,
+        "position": 3,
+        "nonce": "cp30-compact-vast-l2048-o32-c1"
+      },
+      {
+        "logical_request_id": "compact-vast-l4096-o256-c1",
+        "actual_input_tokens": 4152,
+        "requested_output_tokens": 256,
+        "position": 4,
+        "nonce": "cp30-compact-vast-l4096-o256-c1"
+      },
+      {
+        "logical_request_id": "compact-vast-l7168-o256-c1",
+        "actual_input_tokens": 7299,
+        "requested_output_tokens": 256,
+        "position": 5,
+        "nonce": "cp30-compact-vast-l7168-o256-c1"
+      },
+      {
+        "logical_request_id": "compact-vast-l512-o256-c1",
+        "actual_input_tokens": 520,
+        "requested_output_tokens": 256,
+        "position": 6,
+        "nonce": "cp30-compact-vast-l512-o256-c1"
+      },
+      {
+        "logical_request_id": "compact-vast-l4096-o32-c1",
+        "actual_input_tokens": 4059,
+        "requested_output_tokens": 32,
+        "position": 7,
+        "nonce": "cp30-compact-vast-l4096-o32-c1"
+      }
+    ],
+    "1_trace_sha256": "7ee2d4573a27e8c00fd24c485b6657ab9997f668ce705ff30c1517375e546ad0",
+    "4": [
+      {
+        "logical_request_id": "compact-vast-l4096-o32-c4",
+        "actual_input_tokens": 4172,
+        "requested_output_tokens": 32,
+        "position": 0,
+        "nonce": "cp30-compact-vast-l4096-o32-c4"
+      },
+      {
+        "logical_request_id": "compact-vast-l512-o256-c4",
+        "actual_input_tokens": 516,
+        "requested_output_tokens": 256,
+        "position": 1,
+        "nonce": "cp30-compact-vast-l512-o256-c4"
+      },
+      {
+        "logical_request_id": "compact-vast-l4096-o256-c4",
+        "actual_input_tokens": 4164,
+        "requested_output_tokens": 256,
+        "position": 2,
+        "nonce": "cp30-compact-vast-l4096-o256-c4"
+      },
+      {
+        "logical_request_id": "compact-vast-l512-o32-c4",
+        "actual_input_tokens": 519,
+        "requested_output_tokens": 32,
+        "position": 3,
+        "nonce": "cp30-compact-vast-l512-o32-c4"
+      },
+      {
+        "logical_request_id": "compact-vast-l7168-o256-c4",
+        "actual_input_tokens": 7306,
+        "requested_output_tokens": 256,
+        "position": 4,
+        "nonce": "cp30-compact-vast-l7168-o256-c4"
+      },
+      {
+        "logical_request_id": "compact-vast-l2048-o32-c4",
+        "actual_input_tokens": 2071,
+        "requested_output_tokens": 32,
+        "position": 5,
+        "nonce": "cp30-compact-vast-l2048-o32-c4"
+      },
+      {
+        "logical_request_id": "compact-vast-l2048-o256-c4",
+        "actual_input_tokens": 2076,
+        "requested_output_tokens": 256,
+        "position": 6,
+        "nonce": "cp30-compact-vast-l2048-o256-c4"
+      },
+      {
+        "logical_request_id": "compact-vast-l7168-o32-c4",
+        "actual_input_tokens": 7161,
+        "requested_output_tokens": 32,
+        "position": 7,
+        "nonce": "cp30-compact-vast-l7168-o32-c4"
+      }
+    ],
+    "4_trace_sha256": "8c741383b11c6a3909cacf9938ce67a2a3537189ed2b367e641537ec61f870fa"
+  }
+}

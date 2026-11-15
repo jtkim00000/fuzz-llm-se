@@ -80,5 +80,6 @@ BF16 and use the same checkpoint and engine build.
 - `local_workers/` — localhost test facades with explicit precision metadata.
 - `scripts/local_workers.py` — start, inspect, or stop the test facades.
 - `requirements-local-workers.txt` — pinned dependencies for the test facades.
-- `profiling/` — AIPerf smoke test and notes on collecting router data.
+- `profiling/` — VAST-backed benchmark preparation, AIPerf workflows, and
+  deterministic retrieval/JSON accuracy evaluation. See [the setup guide](profiling/README.md).
 - `docs/` — step-by-step profiling guides and the GB10 runbook.
